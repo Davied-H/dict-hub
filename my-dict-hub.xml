@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>dict-hub</Name>
+  <Repository>dongdonghe122/dict-hub</Repository>
+  <Registry>https://hub.docker.com/r/dongdonghe122/dict-hub</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/Davied-H/dict-hub/issues</Support>
+  <Project>https://github.com/Davied-H/dict-hub</Project>
+  <Overview>Dict-Hub is a modern MDX dictionary lookup platform. It supports multiple dictionary management, fast word lookup, and history tracking.&#xD;
+&#xD;
+Features:&#xD;
+- Fast word lookup with millisecond response&#xD;
+- Multiple MDX dictionary support&#xD;
+- Word frequency statistics&#xD;
+- Query history tracking&#xD;
+- Modern UI with dark mode support</Overview>
+  <Category>Productivity: Tools:Utilities</Category>
+  <WebUI>http://[IP]:[PORT:8080]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/Davied-H/dict-hub/main/logo.png</Icon>
+  <Config Name="Web UI Port" Target="8080" Default="8080" Mode="tcp" Description="The port for the web interface." Type="Port" Display="always" Required="true" Mask="false">8080</Config>
+  <Config Name="Data Directory" Target="/app/data" Default="/mnt/user/appdata/dict-hub/data" Mode="rw" Description="Directory for SQLite database storage." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/dict-hub/data</Config>
+  <Config Name="Dictionaries" Target="/app/dicts" Default="/mnt/user/appdata/dict-hub/dicts" Mode="rw" Description="Directory containing .mdx and .mdd dictionary files." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/dict-hub/dicts</Config>
+  <Config Name="Auto Load Dictionaries" Target="MDX_AUTO_LOAD" Default="true" Mode="" Description="Automatically load dictionaries on startup." Type="Variable" Display="always" Required="false" Mask="false">true</Config>
+  <Config Name="Server Mode" Target="SERVER_MODE" Default="production" Mode="" Description="Server running mode (development/production)." Type="Variable" Display="advanced" Required="false" Mask="false">production</Config>
+  <Config Name="Timezone" Target="TZ" Default="Asia/Shanghai" Mode="" Description="Container timezone." Type="Variable" Display="advanced" Required="false" Mask="false">Asia/Shanghai</Config>
+</Container>
