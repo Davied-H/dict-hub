@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 /* ========================================
+   CSS 层叠层定义 - 控制样式优先级
+   优先级从低到高：base < dict-default < dict-custom < overrides
+   ======================================== */
+@layer base, dict-default, dict-custom, overrides;
+
+/* ========================================
    字典内容基础样式
    ======================================== */
 .dict-content {
@@ -546,4 +552,66 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-default-400 dark:bg-default-500;
+}
+
+/* ========================================
+   @layer overrides - 强制覆盖层（最高优先级）
+   用于覆盖字典自带CSS中的特定样式
+   ======================================== */
+@layer overrides {
+  /* 链接样式强制覆盖 */
+  .dict-content a[href^="entry://"] {
+    cursor: pointer !important;
+    text-decoration: underline !important;
+  }
+
+  /* 移动端强制适配 - 防止字典CSS破坏响应式 */
+  @media (max-width: 640px) {
+    .dict-content * {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .dict-content table {
+      display: block !important;
+      overflow-x: auto !important;
+      width: 100% !important;
+    }
+
+    .dict-content img {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    .dict-content pre,
+    .dict-content code {
+      white-space: pre-wrap !important;
+      word-break: break-word !important;
+    }
+  }
+
+  /* 深色模式CSS变量注入 - 供字典CSS使用 */
+  .dict-content {
+    --dict-bg: hsl(var(--heroui-background));
+    --dict-text: hsl(var(--heroui-default-700));
+    --dict-primary: hsl(var(--heroui-primary-600));
+    --dict-secondary: hsl(var(--heroui-secondary-600));
+  }
+
+  .dark .dict-content {
+    --dict-bg: hsl(var(--heroui-background));
+    --dict-text: hsl(var(--heroui-default-300));
+    --dict-primary: hsl(var(--heroui-primary-400));
+    --dict-secondary: hsl(var(--heroui-secondary-400));
+  }
+
+  /* 深色模式滤镜反色备选方案（用于无深色模式支持的字典） */
+  .dark .dict-content.no-dark-mode {
+    filter: invert(0.9) hue-rotate(180deg);
+  }
+
+  .dark .dict-content.no-dark-mode img,
+  .dark .dict-content.no-dark-mode video {
+    filter: invert(1) hue-rotate(180deg);
+  }
 }

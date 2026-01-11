@@ -54,6 +54,7 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 		if svcs.AudioSvc != nil {
 			audioHandler := handler.NewAudioHandler(svcs.AudioSvc)
 			api.GET("/audio/:word", audioHandler.GetAudio)
+			api.GET("/audio/:word/availability", audioHandler.CheckAudioAvailability)
 		}
 
 		// 搜索路由（新增）

@@ -104,7 +104,7 @@ export function DictContent({ html, dictId }: DictContentProps) {
     setPreviewState(null)
   }, [])
 
-  // 提取字典 CSS 链接并动态加载
+  // 提取字典 CSS 链接并动态加载（包装在 @layer dict-custom 中）
   useEffect(() => {
     if (!html) return
 
@@ -121,17 +121,34 @@ export function DictContent({ html, dictId }: DictContentProps) {
       }
     }
 
-    // 动态加载 CSS
-    cssLinks.forEach((href) => {
-      // 检查是否已加载
-      const existingLink = document.querySelector(`link[href="${href}"]`)
-      if (existingLink) return
+    // 动态加载 CSS（使用 @layer 包装以控制优先级）
+    cssLinks.forEach(async (href) => {
+      const cssId = `dict-css-${dictId || 'unknown'}-${href.replace(/[^a-zA-Z0-9]/g, '-')}`
 
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = href
-      link.setAttribute('data-dict-css', dictId?.toString() || 'unknown')
-      document.head.appendChild(link)
+      // 检查是否已加载
+      if (document.getElementById(cssId)) return
+
+      try {
+        const response = await fetch(href)
+        const cssText = await response.text()
+
+        // 包装在 @layer dict-custom 中，使字典CSS优先级低于系统覆盖样式
+        const wrappedCSS = `@layer dict-custom { ${cssText} }`
+
+        const style = document.createElement('style')
+        style.id = cssId
+        style.setAttribute('data-dict-css', dictId?.toString() || 'unknown')
+        style.textContent = wrappedCSS
+        document.head.appendChild(style)
+      } catch (error) {
+        console.warn(`Failed to load dict CSS: ${href}`, error)
+        // 回退方案：直接使用 link 标签加载
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = href
+        link.setAttribute('data-dict-css', dictId?.toString() || 'unknown')
+        document.head.appendChild(link)
+      }
     })
   }, [html, dictId])
 

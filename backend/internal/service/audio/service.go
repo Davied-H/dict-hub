@@ -17,6 +17,12 @@ var (
 	ErrAudioNotFound = errors.New("audio not found")
 )
 
+// 音频类型常量
+const (
+	AudioTypeGB = "gb" // 英音
+	AudioTypeUS = "us" // 美音
+)
+
 // AudioService 统一音频服务
 type AudioService struct {
 	mdxManager    mdx.DictManager
@@ -174,6 +180,81 @@ func (s *AudioService) getFromLSA(word string) (io.Reader, string, error) {
 	}
 
 	return bytes.NewReader(data), "audio/wav", nil
+}
+
+// GetAudioByType 获取指定类型的音频
+func (s *AudioService) GetAudioByType(word, audioType string) (io.Reader, string, error) {
+	word = strings.ToLower(strings.TrimSpace(word))
+	if word == "" {
+		return nil, "", ErrAudioNotFound
+	}
+
+	// 从 MDD 获取指定类型音频
+	return s.getFromMDDByType(word, audioType)
+}
+
+// getFromMDDByType 从 MDD 获取指定类型的音频
+func (s *AudioService) getFromMDDByType(word, audioType string) (io.Reader, string, error) {
+	var patterns []string
+	switch audioType {
+	case AudioTypeGB:
+		patterns = []string{word + "__gb_1.mp3", word + "__gb_2.mp3"}
+	case AudioTypeUS:
+		patterns = []string{word + "__us_1.mp3", word + "__us_2.mp3"}
+	default:
+		return nil, "", ErrAudioNotFound
+	}
+
+	for _, info := range s.mdxManager.ListLoaded() {
+		if !info.HasMDD {
+			continue
+		}
+		for _, pattern := range patterns {
+			if reader, err := s.mdxManager.GetResource(info.ID, pattern); err == nil {
+				return reader, "audio/mpeg", nil
+			}
+		}
+	}
+	return nil, "", ErrAudioNotFound
+}
+
+// CheckAudioAvailability 检查音频可用性
+func (s *AudioService) CheckAudioAvailability(word string) (hasGB, hasUS bool) {
+	word = strings.ToLower(strings.TrimSpace(word))
+	if word == "" {
+		return false, false
+	}
+
+	gbPatterns := []string{word + "__gb_1.mp3", word + "__gb_2.mp3"}
+	usPatterns := []string{word + "__us_1.mp3", word + "__us_2.mp3"}
+
+	for _, info := range s.mdxManager.ListLoaded() {
+		if !info.HasMDD {
+			continue
+		}
+		// 检查 GB
+		if !hasGB {
+			for _, pattern := range gbPatterns {
+				if _, err := s.mdxManager.GetResource(info.ID, pattern); err == nil {
+					hasGB = true
+					break
+				}
+			}
+		}
+		// 检查 US
+		if !hasUS {
+			for _, pattern := range usPatterns {
+				if _, err := s.mdxManager.GetResource(info.ID, pattern); err == nil {
+					hasUS = true
+					break
+				}
+			}
+		}
+		if hasGB && hasUS {
+			break
+		}
+	}
+	return
 }
 
 // Close 关闭音频服务
