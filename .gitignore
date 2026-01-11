@@ -1,0 +1,28 @@
+# 字典文件
+backend/dicts/*.mdx
+backend/dicts/*.mdd
+
+# 数据目录
+backend/data/
+
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+build/
+
+# 环境配置
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+
+# 系统文件
+.DS_Store
+*.log
+
+# PID 文件
+.pids
