@@ -17,11 +17,6 @@ export default function Layout() {
     return location.pathname.startsWith(path)
   }
 
-  // 首页使用自定义布局（无导航栏），其他页面使用标准布局
-  if (location.pathname === '/') {
-    return <Outlet />
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar maxWidth="xl" isBordered>
