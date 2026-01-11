@@ -48,5 +48,7 @@ func autoMigrate(db *gorm.DB) error {
 		&model.Dictionary{},
 		&model.SearchHistory{},
 		&model.WordFrequency{},
+		&model.DictSource{},
+		&model.DownloadTask{},
 	)
 }
