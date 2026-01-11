@@ -14,7 +14,15 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* 移动端禁用 smooth scroll 以提升性能 */
+    scroll-behavior: auto;
+  }
+
+  /* 仅在桌面端启用平滑滚动 */
+  @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -22,6 +30,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    /* 启用硬件加速 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   ::selection {
@@ -52,6 +63,30 @@
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* 移动端减少 backdrop-filter 模糊强度以提升性能 */
+  @media (max-width: 767px) {
+    .glass {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .glass-dark {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+  }
+
+  /* 用户偏好减少动画时禁用所有动画 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
