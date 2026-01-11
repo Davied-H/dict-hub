@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import DocsPage from './pages/DocsPage';
 import DocsQuickstartPage from './pages/DocsQuickstartPage';
 import DocsDockerPage from './pages/DocsDockerPage';
+import DocsUnraidPage from './pages/DocsUnraidPage';
 import DocsConfigurationPage from './pages/DocsConfigurationPage';
 import DocsDictionaryGuidePage from './pages/DocsDictionaryGuidePage';
 import DocsApiPage from './pages/DocsApiPage';
@@ -15,6 +16,7 @@ function App() {
       <Route path="/docs" element={<DocsPage />} />
       <Route path="/docs/quickstart" element={<DocsQuickstartPage />} />
       <Route path="/docs/docker" element={<DocsDockerPage />} />
+      <Route path="/docs/unraid" element={<DocsUnraidPage />} />
       <Route path="/docs/configuration" element={<DocsConfigurationPage />} />
       <Route path="/docs/dictionary-guide" element={<DocsDictionaryGuidePage />} />
       <Route path="/docs/api" element={<DocsApiPage />} />

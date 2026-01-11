@@ -1,0 +1,171 @@
+# Unraid 部署
+
+Dict-Hub 提供官方 Unraid 应用模板，让你可以通过 Unraid 的图形界面轻松安装和管理。
+
+## 安装方式
+
+### 方式一：社区应用商店（推荐）
+
+如果 Dict-Hub 已收录到 Unraid Community Applications：
+
+1. 打开 Unraid Web UI
+2. 进入 **Apps** 页面
+3. 搜索 **Dict-Hub**
+4. 点击 **Install** 安装
+
+### 方式二：手动添加模板
+
+如果应用商店中没有找到，可以手动添加：
+
+1. 打开 Unraid Web UI
+2. 进入 **Docker** 页面
+3. 点击 **Add Container**
+4. 点击底部的 **Template repositories**
+5. 添加模板仓库地址：
+
+```
+https://raw.githubusercontent.com/Davied-H/dict-hub/main/my-dict-hub.xml
+```
+
+6. 返回添加容器页面，在模板下拉菜单选择 **dict-hub**
+
+### 方式三：直接配置
+
+你也可以直接在 Docker 页面手动配置容器：
+
+| 配置项 | 值 |
+|--------|-----|
+| **Repository** | `dongdonghe122/dict-hub:latest` |
+| **Network Type** | `bridge` |
+| **WebUI** | `http://[IP]:[PORT:8080]/` |
+
+## 配置说明
+
+### 端口配置
+
+| 名称 | 容器端口 | 默认值 | 说明 |
+|------|---------|--------|------|
+| Web UI Port | 8080 | 8080 | 网页访问端口 |
+
+如果 8080 端口被占用，可以修改为其他端口（如 8081、9090 等）。
+
+### 目录映射
+
+| 名称 | 容器路径 | 默认主机路径 | 说明 |
+|------|---------|-------------|------|
+| Data Directory | `/app/data` | `/mnt/user/appdata/dict-hub/data` | SQLite 数据库存储 |
+| Dictionaries | `/app/dicts` | `/mnt/user/appdata/dict-hub/dicts` | 词典文件目录 |
+
+### 环境变量
+
+| 变量名 | 默认值 | 说明 |
+|--------|--------|------|
+| `MDX_AUTO_LOAD` | `true` | 启动时自动加载词典 |
+| `SERVER_MODE` | `production` | 运行模式 |
+| `TZ` | `Asia/Shanghai` | 时区设置 |
+
+## 词典目录结构
+
+安装后，请在词典目录下创建以下结构：
+
+```
+/mnt/user/appdata/dict-hub/dicts/
+├── source/              # MDX 词典文件
+│   ├── 牛津高阶.mdx
+│   ├── 朗文当代.mdx
+│   └── ...
+└── sound/               # MDD 音频文件（可选）
+    └── 牛津发音.mdd
+```
+
+> 将你的 `.mdx` 词典文件放入 `source` 目录，`.mdd` 音频文件放入 `sound` 目录。
+
+## 首次启动
+
+1. 完成上述配置后，点击 **Apply** 创建容器
+2. 容器会自动启动并加载词典
+3. 点击容器图标或访问 `http://你的Unraid地址:8080` 打开 Web UI
+4. 首次使用需要等待词典索引完成（取决于词典大小）
+
+## 更新应用
+
+### 通过 Unraid UI 更新
+
+1. 进入 **Docker** 页面
+2. 点击 Dict-Hub 容器图标
+3. 选择 **Check for Updates**
+4. 如有更新，点击 **Update** 按钮
+
+### 命令行更新
+
+通过 Unraid 终端执行：
+
+```bash
+docker pull dongdonghe122/dict-hub:latest
+docker stop dict-hub
+docker rm dict-hub
+# 然后通过 UI 重新创建容器
+```
+
+## 数据备份
+
+### 备份位置
+
+所有用户数据存储在以下目录：
+
+- **数据库**: `/mnt/user/appdata/dict-hub/data/`
+- **词典文件**: `/mnt/user/appdata/dict-hub/dicts/`
+
+### 备份建议
+
+将 `/mnt/user/appdata/dict-hub/` 整个目录纳入 Unraid 的备份计划中。
+
+## 查看日志
+
+通过 Unraid UI 查看：
+
+1. 进入 **Docker** 页面
+2. 点击 Dict-Hub 容器图标
+3. 选择 **Logs**
+
+或通过终端：
+
+```bash
+docker logs dict-hub
+docker logs -f dict-hub  # 实时查看
+```
+
+## 常见问题
+
+### 容器无法启动
+
+1. 检查端口是否被其他应用占用
+2. 确认目录映射路径存在且有正确权限
+3. 查看容器日志排查错误
+
+### 词典无法加载
+
+1. 确认词典文件放在正确的目录结构中
+2. 检查 `.mdx` 文件是否在 `source` 子目录下
+3. 确保文件权限正确（Unraid 用户可读）
+
+### Web UI 无法访问
+
+1. 确认容器正在运行（状态为绿色）
+2. 检查端口映射配置是否正确
+3. 尝试使用 Unraid 服务器的实际 IP 地址访问
+
+### 如何迁移数据
+
+如果需要迁移到新的 Unraid 服务器：
+
+1. 停止 Dict-Hub 容器
+2. 复制整个 `/mnt/user/appdata/dict-hub/` 目录到新服务器
+3. 在新服务器上使用相同配置创建容器
+4. 启动容器，数据会自动加载
+
+## 相关资源
+
+- [Docker Hub 镜像](https://hub.docker.com/r/dongdonghe122/dict-hub)
+- [GitHub 仓库](https://github.com/Davied-H/dict-hub)
+- [问题反馈](https://github.com/Davied-H/dict-hub/issues)
