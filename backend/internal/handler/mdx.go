@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -150,8 +151,13 @@ func (h *MdxHandler) Search(c *gin.Context) {
 
 // GetResource 获取 MDD 资源
 // GET /api/v1/dicts/:id/resource/*path
+// GET /api/v1/resources/:dictId/*path
 func (h *MdxHandler) GetResource(c *gin.Context) {
+	// 支持两种路由参数名：id 和 dictId
 	idStr := c.Param("id")
+	if idStr == "" {
+		idStr = c.Param("dictId")
+	}
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		response.BadRequest(c, "invalid dictionary id")
@@ -161,6 +167,15 @@ func (h *MdxHandler) GetResource(c *gin.Context) {
 	resourcePath := c.Param("path")
 	if resourcePath == "" {
 		response.BadRequest(c, "resource path is required")
+		return
+	}
+
+	// 生成 ETag
+	etag := fmt.Sprintf(`"%d-%s"`, id, resourcePath)
+
+	// 检查条件请求（If-None-Match）
+	if match := c.GetHeader("If-None-Match"); match == etag {
+		c.Status(http.StatusNotModified)
 		return
 	}
 
@@ -189,7 +204,10 @@ func (h *MdxHandler) GetResource(c *gin.Context) {
 		contentType = "application/octet-stream"
 	}
 
+	// 添加 HTTP 缓存头
 	c.Header("Content-Type", contentType)
+	c.Header("Cache-Control", "public, max-age=86400")
+	c.Header("ETag", etag)
 	c.Status(http.StatusOK)
 	io.Copy(c.Writer, reader)
 }

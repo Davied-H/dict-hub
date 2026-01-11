@@ -158,12 +158,50 @@ func (m *manager) Search(word string, dictIDs ...uint) []SearchResult {
 
 		results = append(results, SearchResult{
 			DictID:     id,
+			DictName:   entry.mdx.Name(),
 			DictTitle:  entry.mdx.Title(),
 			Word:       word,
 			Definition: string(result),
 		})
 	}
 
+	return results
+}
+
+// Suggest 跨字典前缀搜索建议
+func (m *manager) Suggest(prefix string, limit int) []SuggestResult {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	prefix = strings.ToLower(prefix)
+	var results []SuggestResult
+	seen := make(map[string]bool) // 去重
+
+	for _, entry := range m.dicts {
+		keywords, err := entry.mdx.GetKeyWordEntries()
+		if err != nil {
+			continue
+		}
+
+		for _, kw := range keywords {
+			if strings.HasPrefix(strings.ToLower(kw.KeyWord), prefix) {
+				// 去重：同一个词只返回一次
+				if seen[kw.KeyWord] {
+					continue
+				}
+				seen[kw.KeyWord] = true
+
+				results = append(results, SuggestResult{
+					Word:      kw.KeyWord,
+					DictID:    entry.id,
+					DictTitle: entry.mdx.Title(),
+				})
+				if len(results) >= limit {
+					return results
+				}
+			}
+		}
+	}
 	return results
 }
 

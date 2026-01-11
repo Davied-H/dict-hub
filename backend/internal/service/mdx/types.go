@@ -16,9 +16,17 @@ type DictInfo struct {
 // SearchResult 搜索结果
 type SearchResult struct {
 	DictID     uint   `json:"dict_id"`
+	DictName   string `json:"dict_name"`
 	DictTitle  string `json:"dict_title"`
 	Word       string `json:"word"`
 	Definition string `json:"definition"`
+}
+
+// SuggestResult 搜索建议结果
+type SuggestResult struct {
+	Word      string `json:"word"`
+	DictID    uint   `json:"dict_id"`
+	DictTitle string `json:"dict_title"`
 }
 
 // DictManager 字典管理器接口
@@ -34,6 +42,9 @@ type DictManager interface {
 
 	// Search 跨字典搜索单词
 	Search(word string, dictIDs ...uint) []SearchResult
+
+	// Suggest 前缀搜索建议
+	Suggest(prefix string, limit int) []SuggestResult
 
 	// GetResource 获取 MDD 资源文件
 	GetResource(dictID uint, path string) (io.Reader, error)
