@@ -24,3 +24,7 @@ cors:
     - Origin
     - Content-Type
     - Authorization
+
+mdx:
+  dict_dir: ./dicts
+  auto_load: false

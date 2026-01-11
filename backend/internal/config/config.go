@@ -9,6 +9,12 @@ type Config struct {
 	Database DatabaseConfig `mapstructure:"database"`
 	Log      LogConfig      `mapstructure:"log"`
 	CORS     CORSConfig     `mapstructure:"cors"`
+	MDX      MDXConfig      `mapstructure:"mdx"`
+}
+
+type MDXConfig struct {
+	DictDir  string `mapstructure:"dict_dir"`
+	AutoLoad bool   `mapstructure:"auto_load"`
 }
 
 type ServerConfig struct {
@@ -44,6 +50,8 @@ func Load() (*Config, error) {
 	viper.SetDefault("database.path", "./data/dictionary.db")
 	viper.SetDefault("log.level", "debug")
 	viper.SetDefault("log.format", "json")
+	viper.SetDefault("mdx.dict_dir", "./dicts")
+	viper.SetDefault("mdx.auto_load", false)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
