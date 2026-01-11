@@ -44,6 +44,7 @@ function DictManager() {
     queryKey: ['dictionaries'],
     queryFn: async () => {
       const res = await dictionariesApi.list()
+      console.log('API Response:', res.data)
       return res.data.data || []
     },
   })
