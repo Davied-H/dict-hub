@@ -37,6 +37,17 @@ func main() {
 	dictSourceSvc := service.NewDictSourceService(db, mdxManager, cfg.MDX.DictDir)
 	downloadSvc := service.NewDownloadService(db, cfg.MDX.DictDir, dictSourceSvc)
 
+	// 自动扫描并添加字典目录中的新字典到数据库
+	if cfg.MDX.AutoLoad {
+		log.Printf("Auto-loading dictionaries from %s...", cfg.MDX.DictDir)
+		addedCount, err := dictSourceSvc.AutoLoadFromDir()
+		if err != nil {
+			log.Printf("Warning: Failed to auto-load dictionaries: %v", err)
+		} else if addedCount > 0 {
+			log.Printf("Auto-loaded %d new dictionaries to database", addedCount)
+		}
+	}
+
 	// 启动时同步：从数据库加载已启用的字典
 	log.Printf("Syncing dictionaries from database...")
 	if err := dictSourceSvc.SyncOnStartup(); err != nil {

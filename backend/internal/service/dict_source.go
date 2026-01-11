@@ -3,6 +3,8 @@ package service
 import (
 	"errors"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 
 	"dict-hub/internal/model"
@@ -253,6 +255,44 @@ func (s *DictSourceService) SyncOnStartup() error {
 	}
 
 	return nil
+}
+
+// AutoLoadFromDir 自动扫描目录中的字典文件并添加到数据库
+func (s *DictSourceService) AutoLoadFromDir() (int, error) {
+	entries, err := os.ReadDir(s.dictDir)
+	if err != nil {
+		return 0, err
+	}
+
+	var addedCount int
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		ext := strings.ToLower(filepath.Ext(entry.Name()))
+		if ext != ".mdx" {
+			continue
+		}
+
+		fullPath := filepath.Join(s.dictDir, entry.Name())
+
+		// 检查是否已存在于数据库
+		var existing model.DictSource
+		if err := s.db.Unscoped().Where("path = ?", fullPath).First(&existing).Error; err == nil {
+			// 已存在，跳过
+			continue
+		}
+
+		// 添加到数据库
+		_, err := s.Add(fullPath)
+		if err != nil {
+			// 记录错误但继续处理其他文件
+			continue
+		}
+		addedCount++
+	}
+
+	return addedCount, nil
 }
 
 // GetRuntimeID 获取字典的运行时 ID（供其他服务使用）
