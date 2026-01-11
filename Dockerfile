@@ -35,7 +35,8 @@ RUN go mod download
 COPY backend/ ./
 
 # Copy frontend build output to web/dist for go:embed
-COPY --from=frontend-builder /app/frontend/dist ./web/dist
+# Note: vite outputs to ../backend/web/dist relative to frontend dir
+COPY --from=frontend-builder /app/backend/web/dist ./web/dist
 
 # Build with embedded static files
 RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o server ./cmd/server
