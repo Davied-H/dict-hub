@@ -18,6 +18,7 @@ const docsSidebar: DocSection[] = [
       { title: '介绍', path: '/docs' },
       { title: '快速开始', path: '/docs/quickstart' },
       { title: 'Docker 部署', path: '/docs/docker' },
+      { title: 'Unraid 部署', path: '/docs/unraid' },
     ],
   },
   {
