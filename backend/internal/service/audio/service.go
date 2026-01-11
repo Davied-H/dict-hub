@@ -105,6 +105,12 @@ func (s *AudioService) GetAudio(word string) (io.Reader, string, error) {
 func (s *AudioService) getFromMDD(word string) (io.Reader, string, error) {
 	// 尝试常见的音频路径格式
 	audioPatterns := []string{
+		// 牛津词典格式（优先级最高，因为最常用）
+		word + "__gb_1.mp3",
+		word + "__gb_2.mp3",
+		word + "__us_1.mp3",
+		word + "__us_2.mp3",
+		// 通用格式
 		word + ".mp3",
 		word + ".wav",
 		word + ".ogg",

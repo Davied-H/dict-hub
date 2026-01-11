@@ -219,16 +219,25 @@ func (m *manager) GetResource(dictID uint, path string) (io.Reader, error) {
 		return nil, ErrNoMDD
 	}
 
-	// 标准化路径
+	// 标准化路径：移除前导斜杠
 	path = strings.TrimPrefix(path, "/")
 	path = strings.TrimPrefix(path, "\\")
 
-	data, err := entry.mdd.Lookup(path)
-	if err != nil {
-		return nil, ErrResourceNotFound
+	// 尝试多种路径格式查找（MDD 文件中的键可能有不同格式）
+	pathVariants := []string{
+		path,            // 原始路径
+		"\\" + path,     // Windows 风格前缀（MDD 常用格式）
+		"/" + path,      // Unix 风格前缀
 	}
 
-	return bytes.NewReader(data), nil
+	for _, p := range pathVariants {
+		data, err := entry.mdd.Lookup(p)
+		if err == nil {
+			return bytes.NewReader(data), nil
+		}
+	}
+
+	return nil, ErrResourceNotFound
 }
 
 // ListLoaded 列出已加载的字典

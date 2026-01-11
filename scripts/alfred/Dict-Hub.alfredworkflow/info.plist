@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.dict-hub.alfred</string>
+	<key>category</key>
+	<string>Productivity</string>
+	<key>connections</key>
+	<dict>
+		<key>0C8E4A2B-1234-5678-9ABC-DEF012345678</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1D9F5B3C-2345-6789-ABCD-EF0123456789</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoaliasuid</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>2E0A6C4D-3456-789A-BCDE-F01234567890</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3F1B7D5E-4567-89AB-CDEF-012345678901</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoaliasuid</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>4G2C8E6F-5678-9ABC-DEF0-123456789012</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5H3D9F7G-6789-ABCD-EF01-234567890123</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoaliasuid</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Dict-Hub</string>
+	<key>description</key>
+	<string>Search words in Dict-Hub dictionary platform</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Dict-Hub</string>
+	<key>objects</key>
+	<array>
+		<!-- Script Filter: dict (search with suggestions) -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>dict</string>
+				<key>queuedelaycustom</key>
+				<integer>200</integer>
+				<key>queuedelayimmediatelyalinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Searching...</string>
+				<key>script</key>
+				<string>./suggest.sh "{query}"</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Search word in Dict-Hub</string>
+				<key>title</key>
+				<string>Dict-Hub Search</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>0C8E4A2B-1234-5678-9ABC-DEF012345678</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<!-- Open URL Action for dict -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>1D9F5B3C-2345-6789-ABCD-EF0123456789</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<!-- Script Filter: dicth (history) -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>dicth</string>
+				<key>queuedelaycustom</key>
+				<integer>100</integer>
+				<key>queuedelayimmediatelyalinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading history...</string>
+				<key>script</key>
+				<string>./history.sh</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>View search history</string>
+				<key>title</key>
+				<string>Dict-Hub History</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>2E0A6C4D-3456-789A-BCDE-F01234567890</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<!-- Open URL Action for history -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>3F1B7D5E-4567-89AB-CDEF-012345678901</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<!-- Script Filter: dictf (word frequency) -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>dictf</string>
+				<key>queuedelaycustom</key>
+				<integer>100</integer>
+				<key>queuedelayimmediatelyalinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading word frequency...</string>
+				<key>script</key>
+				<string>./wordfreq.sh</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>View top searched words</string>
+				<key>title</key>
+				<string>Dict-Hub Word Frequency</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>4G2C8E6F-5678-9ABC-DEF0-123456789012</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<!-- Open URL Action for word frequency -->
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>5H3D9F7G-6789-ABCD-EF01-234567890123</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Dict-Hub Alfred Workflow
+
+Keywords:
+- dict [word]: Search for a word (with auto-suggestions)
+- dicth: View search history
+- dictf: View word frequency stats
+
+Configuration:
+Set environment variables in Alfred Workflow settings:
+- DICT_HUB_API: API base URL (default: http://localhost:8080)
+- DICT_HUB_FRONTEND: Frontend URL (default: http://localhost:3000)
+
+Requirements:
+- jq (install with: brew install jq)
+- Dict-Hub server running</string>
+	<key>uidata</key>
+	<dict>
+		<key>0C8E4A2B-1234-5678-9ABC-DEF012345678</key>
+		<dict>
+			<key>xpos</key>
+			<real>100</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>1D9F5B3C-2345-6789-ABCD-EF0123456789</key>
+		<dict>
+			<key>xpos</key>
+			<real>350</real>
+			<key>ypos</key>
+			<real>50</real>
+		</dict>
+		<key>2E0A6C4D-3456-789A-BCDE-F01234567890</key>
+		<dict>
+			<key>xpos</key>
+			<real>100</real>
+			<key>ypos</key>
+			<real>180</real>
+		</dict>
+		<key>3F1B7D5E-4567-89AB-CDEF-012345678901</key>
+		<dict>
+			<key>xpos</key>
+			<real>350</real>
+			<key>ypos</key>
+			<real>180</real>
+		</dict>
+		<key>4G2C8E6F-5678-9ABC-DEF0-123456789012</key>
+		<dict>
+			<key>xpos</key>
+			<real>100</real>
+			<key>ypos</key>
+			<real>310</real>
+		</dict>
+		<key>5H3D9F7G-6789-ABCD-EF01-234567890123</key>
+		<dict>
+			<key>xpos</key>
+			<real>350</real>
+			<key>ypos</key>
+			<real>310</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>http://localhost:8080</string>
+				<key>placeholder</key>
+				<string>http://localhost:8080</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Dict-Hub API server URL</string>
+			<key>label</key>
+			<string>API Base URL</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>DICT_HUB_API</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>http://localhost:3000</string>
+				<key>placeholder</key>
+				<string>http://localhost:3000</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Dict-Hub frontend URL for opening in browser</string>
+			<key>label</key>
+			<string>Frontend URL</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>DICT_HUB_FRONTEND</string>
+		</dict>
+	</array>
+	<key>version</key>
+	<string>1.0.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/dict-hub</string>
+</dict>
+</plist>
