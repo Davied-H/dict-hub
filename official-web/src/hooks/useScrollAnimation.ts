@@ -1,15 +1,17 @@
 import { useScroll, useTransform, MotionValue } from 'framer-motion';
 import { useRef } from 'react';
 
+type ScrollOffset = NonNullable<Parameters<typeof useScroll>[0]>['offset'];
+
 interface ScrollAnimationOptions {
-  offset?: [string, string];
+  offset?: ScrollOffset;
 }
 
 export function useScrollAnimation(options: ScrollAnimationOptions = {}) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: (options.offset as [string, string]) || ['start end', 'end start'],
+    offset: options.offset ?? ['start end', 'end start'],
   });
 
   return { ref, scrollYProgress };
