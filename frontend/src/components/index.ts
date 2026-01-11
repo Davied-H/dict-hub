@@ -1,5 +1,6 @@
 export { ThemeToggle } from './ThemeToggle'
 export { AudioPlayer } from './AudioPlayer'
 export { DictCard } from './DictCard'
+export { DictContent } from './DictContent'
 export { SearchBar } from './SearchBar'
 export { SearchResults } from './SearchResults'

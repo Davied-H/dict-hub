@@ -2,39 +2,342 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 字典内容样式 - 处理 MDX 输出的 HTML */
+/* ========================================
+   字典内容基础样式
+   ======================================== */
 .dict-content {
-  @apply text-sm leading-relaxed;
+  @apply text-base leading-relaxed text-default-700 dark:text-default-300;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.dict-content img {
-  @apply max-w-full h-auto inline-block;
-}
-
-.dict-content audio {
+/* 隐藏音频元素 */
+.dict-content audio,
+.dict-content .dict-audio {
   @apply hidden;
 }
 
-.dict-content a {
-  @apply text-primary hover:underline;
+/* 隐藏原始样式表 */
+.dict-content link {
+  @apply hidden;
 }
 
+/* ========================================
+   词条结构样式 - 支持常见 MDX 字典格式
+   ======================================== */
+
+/* 词条容器 */
+.dict-content > span,
+.dict-content > div {
+  @apply block;
+}
+
+/* 单词标题 - 多种类名支持 */
+.dict-content .DC,
+.dict-content .headword,
+.dict-content .hw,
+.dict-content .entry-word {
+  @apply text-xl font-bold text-primary-600 dark:text-primary-400 mr-2;
+}
+
+/* 音标 */
+.dict-content .YB,
+.dict-content .CB,
+.dict-content .phonetic,
+.dict-content .pron,
+.dict-content .pronunciation,
+.dict-content [class*="phon"] {
+  @apply text-sm text-secondary-600 dark:text-secondary-400 font-mono mx-1;
+}
+
+.dict-content .YB::before,
+.dict-content .phonetic::before,
+.dict-content .pron::before {
+  content: '/';
+}
+
+.dict-content .YB::after,
+.dict-content .phonetic::after,
+.dict-content .pron::after {
+  content: '/';
+}
+
+/* 词性标注 */
+.dict-content .DX,
+.dict-content .pos,
+.dict-content .part-of-speech,
+.dict-content .gram,
+.dict-content [class*="pos"] {
+  @apply inline-block text-xs font-medium px-2 py-0.5 rounded-full 
+         bg-warning-100 text-warning-700 
+         dark:bg-warning-900/30 dark:text-warning-400
+         mr-2 my-1;
+}
+
+/* 释义编号 */
+.dict-content .sense-num,
+.dict-content .def-num,
+.dict-content .sn {
+  @apply inline-flex items-center justify-center 
+         w-5 h-5 text-xs font-bold rounded-full
+         bg-primary-100 text-primary-700
+         dark:bg-primary-900/30 dark:text-primary-400
+         mr-2;
+}
+
+/* 释义文本 */
+.dict-content .JX,
+.dict-content .def,
+.dict-content .definition,
+.dict-content .meaning,
+.dict-content .sense {
+  @apply block my-3 pl-4 border-l-2 border-primary-200 dark:border-primary-800;
+}
+
+/* 例句 */
+.dict-content .example,
+.dict-content .ex,
+.dict-content .sent,
+.dict-content .sentence,
+.dict-content [class*="example"],
+.dict-content [class*="examp"] {
+  @apply block my-2 pl-4 py-2 
+         bg-default-50 dark:bg-default-100/5 
+         rounded-lg text-default-600 dark:text-default-400
+         italic border-l-3 border-success-300 dark:border-success-700;
+}
+
+/* 例句中的高亮词 */
+.dict-content .example b,
+.dict-content .example strong,
+.dict-content .ex b,
+.dict-content .ex strong {
+  @apply not-italic font-semibold text-primary-600 dark:text-primary-400;
+}
+
+/* 同义词/反义词 */
+.dict-content .syn,
+.dict-content .synonym,
+.dict-content .ant,
+.dict-content .antonym {
+  @apply inline-block text-sm px-2 py-0.5 rounded 
+         bg-secondary-100 text-secondary-700
+         dark:bg-secondary-900/30 dark:text-secondary-400
+         mr-1 my-0.5;
+}
+
+/* 标签/分类 */
+.dict-content .label,
+.dict-content .tag,
+.dict-content .usage,
+.dict-content .register {
+  @apply inline-block text-xs uppercase tracking-wide px-1.5 py-0.5 rounded
+         bg-default-200 text-default-600
+         dark:bg-default-100/10 dark:text-default-400
+         mr-1;
+}
+
+/* 词组/搭配 */
+.dict-content .phrase,
+.dict-content .collocation,
+.dict-content .idiom {
+  @apply font-medium text-default-800 dark:text-default-200;
+}
+
+/* 注释/说明 */
+.dict-content .note,
+.dict-content .usage-note,
+.dict-content .grammar {
+  @apply block my-3 p-3 rounded-lg
+         bg-primary-50 dark:bg-primary-900/20
+         border border-primary-200 dark:border-primary-800
+         text-sm text-primary-700 dark:text-primary-300;
+}
+
+.dict-content .note::before,
+.dict-content .usage-note::before {
+  content: '📝 ';
+}
+
+/* ========================================
+   表格样式
+   ======================================== */
 .dict-content table {
-  @apply w-full border-collapse my-2;
+  @apply w-full border-collapse my-4 text-sm;
 }
 
-.dict-content td,
 .dict-content th {
-  @apply border border-default-200 p-2;
+  @apply bg-default-100 dark:bg-default-100/10 
+         font-semibold text-left p-3
+         border-b-2 border-default-200 dark:border-default-100;
 }
 
-.dict-content p {
-  @apply my-1;
+.dict-content td {
+  @apply p-3 border-b border-default-100 dark:border-default-50;
 }
 
-.dict-content ul,
+.dict-content tr:hover td {
+  @apply bg-default-50 dark:bg-default-100/5;
+}
+
+/* ========================================
+   链接样式
+   ======================================== */
+.dict-content a {
+  @apply text-primary-600 dark:text-primary-400 
+         hover:text-primary-700 dark:hover:text-primary-300
+         underline decoration-primary-300 dark:decoration-primary-700
+         underline-offset-2 transition-colors;
+}
+
+/* ========================================
+   列表样式
+   ======================================== */
+.dict-content ul {
+  @apply my-2 ml-4 space-y-1;
+}
+
+.dict-content ul > li {
+  @apply relative pl-4;
+}
+
+.dict-content ul > li::before {
+  content: '';
+  @apply absolute left-0 top-2.5 w-1.5 h-1.5 rounded-full bg-primary-400;
+}
+
 .dict-content ol {
-  @apply pl-4 my-1;
+  @apply my-2 ml-4 space-y-1 list-decimal;
+}
+
+.dict-content ol > li {
+  @apply pl-1;
+}
+
+/* ========================================
+   图片样式
+   ======================================== */
+.dict-content img {
+  @apply max-w-full h-auto rounded-lg my-2 shadow-sm;
+}
+
+/* ========================================
+   段落和分隔
+   ======================================== */
+.dict-content p {
+  @apply my-2;
+}
+
+.dict-content br {
+  @apply block my-1;
+}
+
+.dict-content hr {
+  @apply my-4 border-default-200 dark:border-default-100;
+}
+
+/* ========================================
+   特定字典样式 - 现代英汉汉英综合大辞典
+   ======================================== */
+
+/* 词条容器 */
+.dict-content .CK {
+  @apply block;
+}
+
+/* 日语/汉字样式 */
+.dict-content .JS {
+  @apply block mt-2;
+}
+
+.dict-content .CY {
+  @apply block;
+}
+
+.dict-content .CX {
+  @apply block mb-3;
+}
+
+/* 单词高亮 */
+.dict-content .YX {
+  @apply text-2xl font-bold text-primary-600 dark:text-primary-400 mr-3;
+}
+
+/* 词条分隔 */
+.dict-content .CK + .CK {
+  @apply mt-4 pt-4 border-t border-default-200 dark:border-default-100;
+}
+
+/* ========================================
+   动画和交互
+   ======================================== */
+.dict-entry {
+  @apply transition-colors duration-200;
+}
+
+.dict-entry:hover {
+  @apply bg-default-50/50 dark:bg-default-100/5;
+}
+
+/* 定义展开动画 */
+.dict-definition {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* 页面元素淡入动画 */
+.animate-fade-in {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-fade-in-delay {
+  animation: fadeInUp 0.7s ease-out 0.2s backwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   卡片样式增强
+   ======================================== */
+.dict-card {
+  @apply transition-shadow duration-200;
+}
+
+.dict-card:hover {
+  @apply shadow-md;
+}
+
+/* ========================================
+   响应式调整
+   ======================================== */
+@media (max-width: 640px) {
+  .dict-content {
+    @apply text-sm;
+  }
+  
+  .dict-content .YX,
+  .dict-content .DC {
+    @apply text-xl;
+  }
+  
+  .dict-content .example,
+  .dict-content .ex {
+    @apply pl-3 py-1.5;
+  }
+}
+
+/* ========================================
+   深色模式特殊处理
+   ======================================== */
+.dark .dict-content {
+  @apply text-default-300;
 }
 
 /* 平滑主题切换 */
@@ -45,4 +348,21 @@ html {
 /* 极简风格调整 */
 body {
   @apply antialiased;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-default-300 dark:bg-default-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-default-400 dark:bg-default-500;
 }

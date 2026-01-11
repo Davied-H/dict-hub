@@ -27,4 +27,4 @@ cors:
 
 mdx:
   dict_dir: ./dicts
-  auto_load: false
+  auto_load: true

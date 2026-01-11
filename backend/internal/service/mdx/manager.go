@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	libmdx "github.com/lib-x/mdx"
+	"dict-hub/pkg/mdict"
 )
 
 var (
@@ -22,8 +22,8 @@ var (
 // dictEntry 内部字典条目
 type dictEntry struct {
 	id   uint
-	mdx  *libmdx.Mdict
-	mdd  *libmdx.Mdict // 可选的 MDD 资源文件
+	mdx  *mdict.Mdict
+	mdd  *mdict.Mdict // 可选的 MDD 资源文件
 	path string
 }
 
@@ -50,7 +50,7 @@ func (m *manager) LoadDict(path string) (uint, error) {
 	}
 
 	// 创建 MDX 实例
-	mdx, err := libmdx.New(path)
+	mdx, err := mdict.New(path)
 	if err != nil {
 		return 0, err
 	}
@@ -75,7 +75,7 @@ func (m *manager) LoadDict(path string) (uint, error) {
 	// 尝试加载同名 MDD 文件
 	mddPath := strings.TrimSuffix(path, filepath.Ext(path)) + ".mdd"
 	if _, err := os.Stat(mddPath); err == nil {
-		mdd, err := libmdx.New(mddPath)
+		mdd, err := mdict.New(mddPath)
 		if err == nil {
 			if err := mdd.BuildIndex(); err == nil {
 				entry.mdd = mdd
@@ -178,21 +178,21 @@ func (m *manager) Suggest(prefix string, limit int) []SuggestResult {
 	seen := make(map[string]bool) // 去重
 
 	for _, entry := range m.dicts {
-		keywords, err := entry.mdx.GetKeyWordEntries()
-		if err != nil {
+		keywords := entry.mdx.GetKeyEntries()
+		if keywords == nil {
 			continue
 		}
 
 		for _, kw := range keywords {
-			if strings.HasPrefix(strings.ToLower(kw.KeyWord), prefix) {
+			if strings.HasPrefix(strings.ToLower(kw.Keyword), prefix) {
 				// 去重：同一个词只返回一次
-				if seen[kw.KeyWord] {
+				if seen[kw.Keyword] {
 					continue
 				}
-				seen[kw.KeyWord] = true
+				seen[kw.Keyword] = true
 
 				results = append(results, SuggestResult{
-					Word:      kw.KeyWord,
+					Word:      kw.Keyword,
 					DictID:    entry.id,
 					DictTitle: entry.mdx.Title(),
 				})
@@ -245,7 +245,7 @@ func (m *manager) ListLoaded() []DictInfo {
 			Description: entry.mdx.Description(),
 			Path:        entry.path,
 			HasMDD:      entry.mdd != nil,
-			WordCount:   entry.mdx.GetKeyWordEntriesSize(),
+			WordCount:   entry.mdx.WordCount(),
 		}
 		infos = append(infos, info)
 	}
