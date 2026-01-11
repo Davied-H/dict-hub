@@ -81,6 +81,70 @@ npm install
 npm run dev
 ```
 
+## 🐳 Docker 部署
+
+### 使用 Docker Compose（推荐）
+
+```bash
+# 克隆项目
+git clone https://github.com/your-username/dict-hub.git
+cd dict-hub
+
+# 创建数据目录
+mkdir -p data dicts/source dicts/sound
+
+# 启动服务
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+```
+
+启动后访问 http://localhost:8080 即可使用。
+
+### 手动构建镜像
+
+```bash
+# 构建镜像
+docker build -t dict-hub .
+
+# 运行容器
+docker run -d \
+  --name dict-hub \
+  -p 8080:8080 \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/dicts:/app/dicts \
+  -e SERVER_MODE=production \
+  dict-hub
+
+# 查看日志
+docker logs -f dict-hub
+```
+
+### 环境变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `SERVER_PORT` | 8080 | 服务端口 |
+| `SERVER_MODE` | development | 运行模式 (development/production) |
+| `DATABASE_PATH` | ./data/dictionary.db | 数据库文件路径 |
+| `MDX_DICT_DIR` | ./dicts | 词典根目录 |
+| `MDX_SOURCE_DIR` | ./dicts/source | MDX 词典源文件目录 |
+| `MDX_SOUND_DIR` | ./dicts/sound | 音频文件目录 |
+| `MDX_AUTO_LOAD` | false | 启动时自动加载词典 |
+
+### 数据持久化
+
+Docker 部署时，以下目录需要挂载为卷以保持数据持久化：
+
+- `./data` - SQLite 数据库文件
+- `./dicts` - 词典文件目录
+  - `./dicts/source` - MDX 词典源文件
+  - `./dicts/sound` - 音频文件
+
 ## 📁 项目结构
 
 ```

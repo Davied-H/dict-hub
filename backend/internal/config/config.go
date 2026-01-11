@@ -1,6 +1,8 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/spf13/viper"
 )
 
@@ -46,6 +48,7 @@ func Load() (*Config, error) {
 	viper.AddConfigPath("./configs")
 	viper.AddConfigPath(".")
 
+	// 设置默认值
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("server.mode", "development")
 	viper.SetDefault("database.driver", "sqlite")
@@ -56,6 +59,11 @@ func Load() (*Config, error) {
 	viper.SetDefault("mdx.source_dir", "./dicts/source")
 	viper.SetDefault("mdx.sound_dir", "./dicts/sound")
 	viper.SetDefault("mdx.auto_load", false)
+
+	// 支持环境变量覆盖配置
+	// 环境变量格式: SERVER_PORT, DATABASE_PATH, MDX_DICT_DIR 等
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {

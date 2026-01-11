@@ -1,0 +1,69 @@
+# =============================================================================
+# Docker Build Ignore File
+# =============================================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node.js
+frontend/node_modules
+frontend/.vite
+frontend/dist
+
+# Go
+backend/bin
+backend/tmp
+
+# IDE & Editor
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Data directories (mounted as volumes)
+data/
+dicts/
+
+# Documentation (not needed in image)
+*.md
+docs/
+
+# Scripts
+scripts/
+start.sh
+*.sh
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*_test.go
+**/*_test.go
+coverage.out
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Claude plans
+.claude/

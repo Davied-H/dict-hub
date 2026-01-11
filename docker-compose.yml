@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  dict-hub:
+    build: .
+    container_name: dict-hub
+    ports:
+      - "8080:8080"
+    volumes:
+      # SQLite database persistence
+      - ./data:/app/data
+      # Dictionary files
+      - ./dicts:/app/dicts
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_MODE=production
+      - DATABASE_PATH=/app/data/dictionary.db
+      - MDX_DICT_DIR=/app/dicts
+      - MDX_SOURCE_DIR=/app/dicts/source
+      - MDX_SOUND_DIR=/app/dicts/sound
+      - MDX_AUTO_LOAD=true
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
