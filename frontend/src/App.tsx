@@ -1,66 +1,85 @@
-import { Button, Input, Card, CardBody, CardHeader } from '@heroui/react'
+import { Button, Chip } from '@heroui/react'
 import { useSearchStore } from '@/stores'
+import { useSearch } from '@/hooks'
+import { ThemeToggle, SearchBar, SearchResults } from '@/components'
 
 function App() {
-  const { keyword, setKeyword, recentSearches, addToRecent, clearRecent } =
-    useSearchStore()
+  const {
+    submittedKeyword,
+    recentSearches,
+    setKeyword,
+    submitSearch,
+    clearRecent,
+  } = useSearchStore()
+  const { data, isLoading, error } = useSearch(submittedKeyword)
 
-  const handleSearch = () => {
-    if (keyword.trim()) {
-      addToRecent(keyword.trim())
-    }
-  }
+  const hasResults = submittedKeyword && (data?.results?.length ?? 0) > 0
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <Card className="mb-8">
-          <CardHeader className="flex-col items-start gap-2">
-            <h1 className="text-2xl font-bold">Dict Hub</h1>
-            <p className="text-default-500">Your Dictionary Application</p>
-          </CardHeader>
-          <CardBody className="gap-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Search for a word..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1"
-              />
-              <Button color="primary" onPress={handleSearch}>
-                Search
+    <div className="min-h-screen bg-background transition-colors duration-300">
+      {/* 主题切换按钮 - 固定右上角 */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
+      {/* 主内容区 */}
+      <main
+        className={`flex flex-col items-center px-4 transition-all duration-500 ${
+          hasResults ? 'pt-8' : 'pt-[30vh]'
+        }`}
+      >
+        {/* Logo/品牌 */}
+        <h1
+          className={`font-bold text-default-800 transition-all duration-500 mb-8 ${
+            hasResults ? 'text-2xl' : 'text-4xl'
+          }`}
+        >
+          Dict Hub
+        </h1>
+
+        {/* 搜索栏 */}
+        <SearchBar />
+
+        {/* 最近搜索 - 仅在无结果时显示 */}
+        {!hasResults && recentSearches.length > 0 && (
+          <div className="mt-8 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm text-default-500">最近搜索</span>
+              <Button size="sm" variant="light" onPress={clearRecent}>
+                清除
               </Button>
             </div>
-          </CardBody>
-        </Card>
-
-        {recentSearches.length > 0 && (
-          <Card>
-            <CardHeader className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Recent Searches</h2>
-              <Button size="sm" variant="light" onPress={clearRecent}>
-                Clear
-              </Button>
-            </CardHeader>
-            <CardBody>
-              <div className="flex flex-wrap gap-2">
-                {recentSearches.map((word) => (
-                  <Button
-                    key={word}
-                    size="sm"
-                    variant="flat"
-                    onPress={() => setKeyword(word)}
-                  >
-                    {word}
-                  </Button>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+            <div className="flex flex-wrap gap-2">
+              {recentSearches.slice(0, 8).map((word) => (
+                <Chip
+                  key={word}
+                  variant="flat"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setKeyword(word)
+                    submitSearch(word)
+                  }}
+                >
+                  {word}
+                </Chip>
+              ))}
+            </div>
+          </div>
         )}
-      </div>
-    </main>
+
+        {/* 搜索结果区域 */}
+        {submittedKeyword && (
+          <div className="w-full max-w-4xl mt-8 pb-16">
+            <SearchResults
+              results={data?.results ?? []}
+              keyword={submittedKeyword}
+              isLoading={isLoading}
+              error={error}
+            />
+          </div>
+        )}
+      </main>
+    </div>
   )
 }
 

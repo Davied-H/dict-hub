@@ -1,28 +1,22 @@
 import { apiClient } from './client'
-import type { Word, ApiResponse, PagedResponse } from '@/types'
+import type { ApiResponse, SearchResponse, SuggestResponse } from '@/types'
 
-export const dictionaryApi = {
-  getWords: async (page = 1, pageSize = 20) => {
-    const response = await apiClient.get<PagedResponse<Word[]>>('/words', {
-      params: { page, page_size: pageSize },
-    })
-    return response.data
+export const searchApi = {
+  // 跨字典搜索
+  search: async (word: string): Promise<SearchResponse> => {
+    const response = await apiClient.get<ApiResponse<SearchResponse>>(
+      '/search',
+      { params: { word } }
+    )
+    return response.data.data!
   },
 
-  getWord: async (id: number) => {
-    const response = await apiClient.get<ApiResponse<Word>>(`/words/${id}`)
-    return response.data
-  },
-
-  search: async (keyword: string) => {
-    const response = await apiClient.get<ApiResponse<Word[]>>('/search', {
-      params: { q: keyword },
-    })
-    return response.data
-  },
-
-  createWord: async (word: Omit<Word, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const response = await apiClient.post<ApiResponse<Word>>('/words', word)
-    return response.data
+  // 搜索建议（自动补全）
+  suggest: async (q: string, limit = 10): Promise<SuggestResponse> => {
+    const response = await apiClient.get<ApiResponse<SuggestResponse>>(
+      '/search/suggest',
+      { params: { q, limit } }
+    )
+    return response.data.data!
   },
 }

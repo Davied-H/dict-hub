@@ -4,7 +4,11 @@ import { HeroUIProvider } from '@heroui/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { initTheme } from '@/stores'
 import './index.css'
+
+// 初始化主题（在渲染前执行，避免闪烁）
+initTheme()
 
 const queryClient = new QueryClient({
   defaultOptions: {

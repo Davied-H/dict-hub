@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 字典内容样式 - 处理 MDX 输出的 HTML */
+.dict-content {
+  @apply text-sm leading-relaxed;
+}
+
+.dict-content img {
+  @apply max-w-full h-auto inline-block;
+}
+
+.dict-content audio {
+  @apply hidden;
+}
+
+.dict-content a {
+  @apply text-primary hover:underline;
+}
+
+.dict-content table {
+  @apply w-full border-collapse my-2;
+}
+
+.dict-content td,
+.dict-content th {
+  @apply border border-default-200 p-2;
+}
+
+.dict-content p {
+  @apply my-1;
+}
+
+.dict-content ul,
+.dict-content ol {
+  @apply pl-4 my-1;
+}
+
+/* 平滑主题切换 */
+html {
+  @apply transition-colors duration-300;
+}
+
+/* 极简风格调整 */
+body {
+  @apply antialiased;
+}
