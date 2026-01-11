@@ -26,3 +26,7 @@ build/
 
 # PID 文件
 .pids
+
+
+backend/web/dist/*
+!backend/web/dist/.gitkeep

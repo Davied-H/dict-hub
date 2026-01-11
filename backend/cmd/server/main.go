@@ -10,6 +10,7 @@ import (
 	"dict-hub/internal/service"
 	"dict-hub/internal/service/audio"
 	"dict-hub/internal/service/mdx"
+	"dict-hub/web"
 )
 
 func main() {
@@ -69,7 +70,13 @@ func main() {
 		AudioSvc:      audioSvc,
 	}
 
-	r := router.Setup(cfg, db, mdxManager, svcs)
+	// 获取嵌入的静态文件系统
+	staticFS, err := web.GetFS()
+	if err != nil {
+		log.Printf("Warning: Failed to load embedded static files: %v", err)
+	}
+
+	r := router.Setup(cfg, db, mdxManager, svcs, staticFS)
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Printf("Server starting on http://localhost%s", addr)

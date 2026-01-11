@@ -4,10 +4,24 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+
+  build: {
+    outDir: '../backend/web/dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@heroui/react', 'framer-motion'],
+        }
+      }
+    }
   },
 
   server: {

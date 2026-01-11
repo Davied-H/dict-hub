@@ -1,6 +1,7 @@
 package router
 
 import (
+	"io/fs"
 	"time"
 
 	"dict-hub/internal/cache"
@@ -24,7 +25,7 @@ type Services struct {
 	AudioSvc      *audio.AudioService
 }
 
-func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Services) *gin.Engine {
+func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Services, staticFS fs.FS) *gin.Engine {
 	if cfg.Server.Mode == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -40,7 +41,7 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 
 	// 静态资源目录（支持独立的音频、图片等文件）
 	r.Static("/static", cfg.MDX.DictDir)
-	
+
 	// 字典静态资源目录（CSS/JS/图片等）
 	r.Static("/dict-assets", cfg.MDX.SourceDir)
 
@@ -106,6 +107,11 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 		// 词频路由（新增）
 		wordFreqHandler := handler.NewWordFreqHandler(svcs.WordFreqSvc)
 		api.POST("/wordfreq/import", wordFreqHandler.Import)
+	}
+
+	// SPA 路由支持：未匹配的路由返回 index.html
+	if staticFS != nil {
+		r.NoRoute(middleware.SPAHandler(staticFS))
 	}
 
 	return r
