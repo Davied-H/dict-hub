@@ -72,9 +72,7 @@ export default function Hero() {
                 </a>
 
                 <a
-                  href="https://github.com/Davied-H/dict-hub"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/docs"
                   className="flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl font-semibold text-lg hover:bg-slate-200 transition-colors"
                 >
                   查看文档
@@ -244,9 +242,7 @@ export default function Hero() {
                 </motion.a>
 
                 <motion.a
-                  href="https://github.com/Davied-H/dict-hub"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/docs"
                   className="flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl font-semibold text-lg hover:bg-slate-200 transition-colors"
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
