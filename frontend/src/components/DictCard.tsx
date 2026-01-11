@@ -94,8 +94,18 @@ function extractTextPreview(html: string, maxLength = 120): string {
 
 // 尝试从 HTML 定义中提取音标
 function extractPhonetic(html: string): string | null {
-  const phoneticMatch = html.match(/[\/\[][^\]\/]{1,40}[\/\]]/)
-  return phoneticMatch ? phoneticMatch[0] : null
+  // 排除包含 HTML 标签字符 < > 的匹配
+  const phoneticMatch = html.match(/[\/\[][^\]\/\<\>]{1,40}[\/\]]/)
+  if (!phoneticMatch) return null
+  const match = phoneticMatch[0]
+  // 排除看起来像代码/HTML/URL/路径 的内容
+  const excludePatterns = ['font', 'span', 'div', 'api', 'http', 'www', 'com', 'org', 'class', 'style', 'css', 'href', 'src', 'img', 'link', 'script', 'html', 'xml', 'json', 'dict', 'assets', 'static', 'public', 'data', 'type', 'rel=']
+  if (excludePatterns.some(p => match.toLowerCase().includes(p))) {
+    return null
+  }
+  // 音标通常包含特殊音标符号或字母，长度至少3个字符
+  if (match.length < 3) return null
+  return match
 }
 
 interface DictCardProps {
@@ -139,7 +149,6 @@ export function DictCard({ dictTitle, results, keyword = '', isExactSection = fa
   }
 
   const allExpanded = expandedEntries.size === results.length
-  const anyExpanded = expandedEntries.size > 0
 
   return (
     <Card 
