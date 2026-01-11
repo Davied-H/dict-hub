@@ -1,0 +1,96 @@
+# Dict-Hub 文档
+
+欢迎使用 Dict-Hub！这是一个现代化的本地词典服务，让你随时随地快速查词。
+
+## 什么是 Dict-Hub？
+
+Dict-Hub 是一个基于 Go + React 构建的开源词典查询平台，支持 MDX/MDD 格式词典文件。它可以部署在本地或服务器上，提供快速、私密的词典查询服务。
+
+## 主要特性
+
+### 多词典支持
+- 支持同时加载多个 MDX 词典
+- 自由启用/禁用词典
+- 搜索结果按词典分组展示
+
+### 快速搜索
+- 毫秒级查询响应
+- 智能自动补全
+- 支持模糊搜索
+
+### 发音支持
+- 支持 MDD 音频资源
+- 点击即可播放发音
+- 支持多种音频格式
+
+### 现代化界面
+- 响应式设计，支持移动端
+- 深色模式支持
+- 流畅的动画效果
+
+### 轻量部署
+- 单二进制文件，开箱即用
+- Docker 一键部署
+- 最小资源占用
+
+## 技术架构
+
+```
+┌─────────────────────────────────────────┐
+│              Frontend                    │
+│         React 19 + TailwindCSS          │
+└─────────────────┬───────────────────────┘
+                  │ HTTP/REST
+┌─────────────────▼───────────────────────┐
+│               Backend                    │
+│            Go + Gin + GORM              │
+├─────────────────────────────────────────┤
+│  MDX Parser  │  Search  │  Audio Service│
+└──────────────┴──────────┴───────────────┘
+                  │
+┌─────────────────▼───────────────────────┐
+│              Storage                     │
+│         SQLite + MDX/MDD Files          │
+└─────────────────────────────────────────┘
+```
+
+## 快速开始
+
+最快的方式是使用 Docker：
+
+```bash
+docker run -d \
+  --name dict-hub \
+  -p 8080:8080 \
+  -v ./dicts:/app/dicts \
+  dongdonghe122/dict-hub:latest
+```
+
+然后访问 http://localhost:8080
+
+> 详细安装步骤请查看 [快速开始](/dict-hub/docs/quickstart) 指南。
+
+## 文档导航
+
+### 入门
+- [快速开始](/dict-hub/docs/quickstart) - 安装和运行
+- [Docker 部署](/dict-hub/docs/docker) - Docker 详细配置
+
+### 使用
+- [词典使用指南](/dict-hub/docs/dictionary-guide) - 词典文件管理
+- [配置说明](/dict-hub/docs/configuration) - 配置项详解
+
+### 开发
+- [API 接口](/dict-hub/docs/api) - REST API 文档
+
+### 帮助
+- [常见问题](/dict-hub/docs/faq) - FAQ 和故障排查
+
+## 获取帮助
+
+- **GitHub**: [dongdonghe122/dict-hub](https://github.com/dongdonghe122/dict-hub)
+- **Issues**: [提交问题](https://github.com/dongdonghe122/dict-hub/issues)
+
+## 开源协议
+
+Dict-Hub 采用 MIT 协议开源，欢迎贡献代码和提交建议。

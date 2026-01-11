@@ -1,0 +1,117 @@
+# 快速开始
+
+本指南将帮助你在几分钟内启动 Dict-Hub 词典服务。
+
+## 环境要求
+
+- **Docker**（推荐）：Docker 20.10+
+- **或** Go 1.24+、Node.js 20+（从源码构建）
+
+## 方式一：Docker 部署（推荐）
+
+最简单的方式是使用 Docker：
+
+```bash
+# 创建目录
+mkdir -p dict-hub/{data,dicts/source,dicts/sound}
+cd dict-hub
+
+# 启动服务
+docker run -d \
+  --name dict-hub \
+  -p 8080:8080 \
+  -v ./dicts:/app/dicts \
+  -v ./data:/app/data \
+  dongdonghe122/dict-hub:latest
+```
+
+启动后访问 [http://localhost:8080](http://localhost:8080)
+
+> 详细的 Docker 配置请参考 [Docker 部署](/dict-hub/docs/docker) 文档。
+
+## 方式二：二进制文件运行
+
+从 [GitHub Releases](https://github.com/dongdonghe122/dict-hub/releases) 下载对应平台的二进制文件：
+
+```bash
+# 下载（以 Linux amd64 为例）
+wget https://github.com/dongdonghe122/dict-hub/releases/latest/download/dict-hub-linux-amd64.tar.gz
+
+# 解压
+tar -xzf dict-hub-linux-amd64.tar.gz
+cd dict-hub
+
+# 运行
+./dict-hub
+```
+
+## 方式三：从源码构建
+
+```bash
+# 克隆仓库
+git clone https://github.com/dongdonghe122/dict-hub.git
+cd dict-hub
+
+# 构建（需要 Go 1.24+ 和 Node.js 20+）
+make build
+
+# 运行
+./backend/dict-hub
+```
+
+## 添加词典文件
+
+Dict-Hub 支持 MDX/MDD 格式的词典文件。
+
+### 目录结构
+
+```
+dicts/
+├── source/          # MDX 词典文件
+│   ├── 牛津高阶.mdx
+│   └── 朗文当代.mdx
+└── sound/           # MDD 音频文件（可选）
+    └── 牛津发音.mdd
+```
+
+### 添加词典
+
+1. 将 `.mdx` 词典文件放入 `dicts/source/` 目录
+2. 将 `.mdd` 音频文件放入 `dicts/sound/` 目录（可选）
+3. 重启服务或在设置页面重新加载
+
+> 更多词典配置请参考 [词典使用指南](/dict-hub/docs/dictionary-guide)
+
+## 访问 Web 界面
+
+服务启动后，打开浏览器访问：
+
+- **主页**：http://localhost:8080
+- **设置**：http://localhost:8080/settings
+- **历史**：http://localhost:8080/history
+
+## 基本使用
+
+### 搜索单词
+
+在搜索框输入单词，支持：
+- 精确匹配
+- 模糊搜索
+- 自动补全建议
+
+### 管理词典
+
+在设置页面可以：
+- 查看已加载的词典
+- 启用/禁用特定词典
+- 调整词典显示顺序
+
+### 查看历史
+
+历史页面记录了所有查询过的单词，方便复习。
+
+## 下一步
+
+- [配置说明](/dict-hub/docs/configuration) - 了解所有配置选项
+- [词典使用指南](/dict-hub/docs/dictionary-guide) - 词典文件详细说明
+- [API 接口](/dict-hub/docs/api) - 开发者 API 文档

@@ -1,0 +1,261 @@
+# 常见问题
+
+收集了用户常见的问题和解决方案。
+
+## 安装问题
+
+### Docker 启动失败
+
+**问题**：`docker: Error response from daemon: Conflict`
+
+**解决方案**：容器名称冲突，先删除旧容器：
+
+```bash
+docker rm -f dict-hub
+docker run -d --name dict-hub ...
+```
+
+### 端口被占用
+
+**问题**：`Error starting userland proxy: listen tcp 0.0.0.0:8080: bind: address already in use`
+
+**解决方案**：
+
+1. 查看占用端口的进程：
+   ```bash
+   lsof -i :8080
+   ```
+
+2. 使用其他端口：
+   ```bash
+   docker run -d -p 9090:8080 ...
+   ```
+
+### 无法拉取镜像
+
+**问题**：网络问题导致无法从 Docker Hub 拉取镜像
+
+**解决方案**：使用镜像加速器或从源码构建：
+
+```bash
+# 从源码构建
+git clone https://github.com/dongdonghe122/dict-hub.git
+cd dict-hub
+make build
+```
+
+## 词典问题
+
+### 词典无法加载
+
+**问题**：添加了 MDX 文件但系统未识别
+
+**排查步骤**：
+
+1. 检查文件位置是否正确：
+   ```
+   dicts/source/词典名.mdx
+   ```
+
+2. 检查文件权限：
+   ```bash
+   chmod 644 dicts/source/*.mdx
+   ```
+
+3. 查看错误日志：
+   ```bash
+   docker logs dict-hub | grep -i error
+   ```
+
+4. 尝试重新加载：
+   在设置页面点击「重新加载词典」
+
+### 词典内容显示乱码
+
+**问题**：查询结果中出现乱码字符
+
+**解决方案**：
+
+1. 确认词典文件编码为 UTF-8
+2. 部分旧版词典使用 GBK 编码，需要转换
+3. 检查词典文件是否损坏
+
+### 词典显示样式异常
+
+**问题**：词典内容没有正确的 CSS 样式
+
+**解决方案**：
+
+某些词典的 CSS 文件是独立的，需要确保：
+
+1. CSS 文件在 `dicts/source/` 目录中
+2. 检查浏览器控制台是否有 404 错误
+3. 清除浏览器缓存重试
+
+## 音频问题
+
+### 音频无法播放
+
+**问题**：点击发音按钮没有声音
+
+**排查步骤**：
+
+1. 检查 MDD 文件是否存在：
+   ```bash
+   ls -la dicts/sound/
+   ```
+
+2. 确认 MDD 文件放在正确目录：
+   ```
+   dicts/sound/音频文件.mdd
+   ```
+
+3. 检查音频 API 是否正常：
+   ```bash
+   curl http://localhost:8080/api/v1/audio/hello
+   ```
+
+### 部分单词没有发音
+
+**问题**：某些单词可以发音，某些不行
+
+**说明**：
+
+- 音频资源取决于 MDD 文件的内容
+- 不是所有单词都有对应的音频
+- 检查音频可用性：
+  ```bash
+  curl http://localhost:8080/api/v1/audio/word/availability
+  ```
+
+## 性能问题
+
+### 搜索响应慢
+
+**问题**：搜索时等待时间过长
+
+**优化建议**：
+
+1. 减少同时启用的词典数量
+2. 增加服务器内存
+3. 使用 SSD 存储词典文件
+4. 检查日志是否有错误：
+   ```bash
+   docker logs dict-hub --tail 100
+   ```
+
+### 内存占用过高
+
+**问题**：Dict-Hub 占用大量内存
+
+**说明**：
+
+- 每个加载的词典会占用内存
+- 建议只启用常用词典
+- 大型词典（如百万词条）会占用更多内存
+
+**限制容器内存**：
+
+```bash
+docker run -d --memory=1g ...
+```
+
+### 启动时间长
+
+**问题**：服务启动需要很长时间
+
+**原因**：
+
+- 启动时会加载所有词典并建立索引
+- 词典文件越大，启动越慢
+
+**优化**：
+
+1. 减少词典数量
+2. 使用 SSD
+3. 禁用自动加载，手动加载需要的词典：
+   ```yaml
+   mdx:
+     auto_load: false
+   ```
+
+## 数据问题
+
+### 如何备份数据
+
+**备份步骤**：
+
+```bash
+# 停止服务
+docker stop dict-hub
+
+# 备份数据目录
+cp -r data/ data_backup/
+cp -r dicts/ dicts_backup/
+
+# 启动服务
+docker start dict-hub
+```
+
+### 如何迁移到新服务器
+
+**迁移步骤**：
+
+1. 在旧服务器备份数据：
+   ```bash
+   tar -czf dict-hub-backup.tar.gz data/ dicts/
+   ```
+
+2. 传输到新服务器：
+   ```bash
+   scp dict-hub-backup.tar.gz user@new-server:/path/
+   ```
+
+3. 在新服务器解压并启动：
+   ```bash
+   tar -xzf dict-hub-backup.tar.gz
+   docker run -d -v ./data:/app/data -v ./dicts:/app/dicts ...
+   ```
+
+### 历史记录丢失
+
+**问题**：重启后历史记录消失
+
+**原因**：
+
+- 数据库文件未持久化
+- 确保挂载了 `data` 目录：
+  ```bash
+  docker run -d -v ./data:/app/data ...
+  ```
+
+## 其他问题
+
+### 如何查看版本号
+
+```bash
+# Docker 方式
+docker exec dict-hub ./server --version
+
+# 或查看健康检查接口
+curl http://localhost:8080/health
+```
+
+### 如何提交 Bug
+
+1. 访问 [GitHub Issues](https://github.com/dongdonghe122/dict-hub/issues)
+2. 搜索是否已有类似问题
+3. 创建新 Issue，包含：
+   - 问题描述
+   - 复现步骤
+   - 错误日志
+   - 环境信息（操作系统、Docker 版本等）
+
+### 如何贡献代码
+
+1. Fork 项目
+2. 创建功能分支
+3. 提交代码
+4. 创建 Pull Request
+
+详见 [贡献指南](https://github.com/dongdonghe122/dict-hub/blob/main/CONTRIBUTING.md)
