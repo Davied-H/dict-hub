@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function Navbar() {
   const { scrollY } = useScroll();
@@ -25,9 +26,7 @@ export default function Navbar() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <div className="w-9 h-9 bg-gradient-primary rounded-xl flex items-center justify-center text-white text-lg">
-            📚
-          </div>
+          <img src="/dict-hub/logo.png" alt="Dict-Hub" className="w-9 h-9" />
           Dict-Hub
         </motion.a>
 
@@ -44,6 +43,17 @@ export default function Navbar() {
               </motion.a>
             </motion.li>
           ))}
+          <motion.li>
+            <Link
+              to="/docs"
+              className="text-slate-600 font-medium text-sm hover:text-primary transition-colors relative group"
+            >
+              <motion.span whileHover={{ y: -2 }} className="inline-block">
+                文档
+              </motion.span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary group-hover:w-full transition-all duration-300" />
+            </Link>
+          </motion.li>
         </ul>
 
         <motion.a

@@ -10,6 +10,7 @@ import {
   NavbarMenuItem,
 } from '@heroui/react'
 import { ThemeToggle } from './ThemeToggle'
+import { FeedbackButton } from './FeedbackButton'
 
 const menuItems = [
   { name: '首页', path: '/' },
@@ -38,7 +39,8 @@ export default function Layout() {
 
         {/* Logo - 移动端居中，桌面端靠左 */}
         <NavbarBrand className="sm:flex-grow-0">
-          <Link to="/" className="font-bold text-inherit text-xl">
+          <Link to="/" className="flex items-center gap-2 font-bold text-inherit text-xl">
+            <img src="/logo.png" alt="Dict Hub" className="w-8 h-8" />
             Dict Hub
           </Link>
         </NavbarBrand>
@@ -61,8 +63,11 @@ export default function Layout() {
           ))}
         </NavbarContent>
 
-        {/* 主题切换按钮 */}
+        {/* 反馈按钮和主题切换按钮 */}
         <NavbarContent justify="end">
+          <NavbarItem className="hidden sm:flex">
+            <FeedbackButton />
+          </NavbarItem>
           <NavbarItem>
             <ThemeToggle />
           </NavbarItem>
@@ -85,6 +90,9 @@ export default function Layout() {
               </Link>
             </NavbarMenuItem>
           ))}
+          <NavbarMenuItem>
+            <FeedbackButton variant="menu" onClose={() => setIsMenuOpen(false)} />
+          </NavbarMenuItem>
         </NavbarMenu>
       </Navbar>
 
