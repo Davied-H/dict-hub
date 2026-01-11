@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { useShouldReduceMotion } from '../hooks/useIsMobile';
 
 const features = [
   {
@@ -164,12 +165,44 @@ const features = [
 function FeatureCard({
   feature,
   index,
+  reduceMotion,
 }: {
   feature: (typeof features)[0];
   index: number;
+  reduceMotion: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: true, margin: '-100px' });
+
+  // 移动端使用简化的动画
+  if (reduceMotion) {
+    return (
+      <div
+        ref={cardRef}
+        className={`group relative bg-white rounded-3xl border border-slate-200/80 overflow-hidden hover:shadow-2xl ${feature.shadowColor} transition-shadow duration-500`}
+      >
+        <div className={`h-1.5 bg-gradient-to-r ${feature.color}`} />
+        <div className="p-8">
+          <div className="relative mb-6">
+            <div
+              className={`relative w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-3xl shadow-lg ${feature.shadowColor}`}
+            >
+              {feature.icon}
+            </div>
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-3">
+            {feature.title}
+          </h3>
+          <p className="text-slate-600 leading-relaxed mb-6">
+            {feature.description}
+          </p>
+          <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+            {feature.demo}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -238,6 +271,8 @@ function FeatureCard({
 
 export default function Features() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useShouldReduceMotion();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'center center'],
@@ -252,78 +287,99 @@ export default function Features() {
       id="features"
       className="relative py-32 bg-gradient-to-b from-white via-slate-50 to-white overflow-hidden"
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"
-          animate={{
-            x: [0, -30, 0],
-            y: [0, -50, 0],
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-full blur-3xl"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        />
-      </div>
+      {/* Animated background elements - 仅在桌面端显示 */}
+      {!reduceMotion && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div
+            className="absolute top-20 left-10 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl"
+            animate={{
+              x: [0, 50, 0],
+              y: [0, 30, 0],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"
+            animate={{
+              x: [0, -30, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-full blur-3xl"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+      )}
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Section header */}
-        <motion.div
-          className="text-center mb-20"
-          style={{ y: titleY, opacity: titleOpacity }}
-        >
+        {reduceMotion ? (
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+              </span>
+              <span className="text-primary font-semibold text-sm">功能特性</span>
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-extrabold mb-6">
+              <span className="text-slate-900">为</span>
+              <span className="text-gradient">效率</span>
+              <span className="text-slate-900">而生</span>
+            </h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Dict-Hub 提供一系列强大功能，让词汇学习与查询更加高效便捷
+            </p>
+          </div>
+        ) : (
           <motion.div
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full mb-6"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            className="text-center mb-20"
+            style={{ y: titleY, opacity: titleOpacity }}
           >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-            </span>
-            <span className="text-primary font-semibold text-sm">功能特性</span>
+            <motion.div
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full mb-6"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+              </span>
+              <span className="text-primary font-semibold text-sm">功能特性</span>
+            </motion.div>
+
+            <motion.h2
+              className="text-4xl lg:text-6xl font-extrabold mb-6"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <span className="text-slate-900">为</span>
+              <span className="text-gradient">效率</span>
+              <span className="text-slate-900">而生</span>
+            </motion.h2>
+
+            <motion.p
+              className="text-xl text-slate-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Dict-Hub 提供一系列强大功能，让词汇学习与查询更加高效便捷
+            </motion.p>
           </motion.div>
-
-          <motion.h2
-            className="text-4xl lg:text-6xl font-extrabold mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <span className="text-slate-900">为</span>
-            <span className="text-gradient">效率</span>
-            <span className="text-slate-900">而生</span>
-          </motion.h2>
-
-          <motion.p
-            className="text-xl text-slate-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Dict-Hub 提供一系列强大功能，让词汇学习与查询更加高效便捷
-          </motion.p>
-        </motion.div>
+        )}
 
         {/* Feature cards grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, i) => (
-            <FeatureCard key={feature.title} feature={feature} index={i} />
+            <FeatureCard key={feature.title} feature={feature} index={i} reduceMotion={reduceMotion} />
           ))}
         </div>
       </div>
