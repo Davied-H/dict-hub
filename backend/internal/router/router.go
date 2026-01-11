@@ -56,7 +56,7 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 		}
 
 		// 搜索路由（新增）
-		searchHandler := handler.NewSearchHandlerWithDictSource(mdxManager, cacheInstance, db, svcs.DictSourceSvc)
+		searchHandler := handler.NewSearchHandlerWithDictSource(mdxManager, cacheInstance, db, svcs.DictSourceSvc, svcs.HistorySvc)
 		api.GET("/search", searchHandler.Search)
 		api.GET("/search/suggest", searchHandler.Suggest)
 

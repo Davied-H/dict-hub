@@ -91,7 +91,7 @@ export default function Home() {
               <Chip
                 key={word}
                 variant="flat"
-                className="cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+                className="cursor-pointer hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors text-default-700 dark:text-default-300"
                 onClick={() => {
                   setKeyword(word)
                   submitSearch(word)

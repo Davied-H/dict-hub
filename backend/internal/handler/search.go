@@ -26,10 +26,11 @@ const (
 
 // SearchHandler 搜索处理器
 type SearchHandler struct {
-	manager       mdx.DictManager
-	cache         *cache.Cache
-	db            *gorm.DB
-	dictSourceSvc *service.DictSourceService
+	manager        mdx.DictManager
+	cache          *cache.Cache
+	db             *gorm.DB
+	dictSourceSvc  *service.DictSourceService
+	historyService *service.HistoryService
 }
 
 // NewSearchHandler 创建搜索处理器（向后兼容）
@@ -38,18 +39,21 @@ func NewSearchHandler(manager mdx.DictManager, cache *cache.Cache, db *gorm.DB) 
 }
 
 // NewSearchHandlerWithDictSource 创建带字典来源服务的搜索处理器
-func NewSearchHandlerWithDictSource(manager mdx.DictManager, cache *cache.Cache, db *gorm.DB, dictSourceSvc *service.DictSourceService) *SearchHandler {
+func NewSearchHandlerWithDictSource(manager mdx.DictManager, cache *cache.Cache, db *gorm.DB, dictSourceSvc *service.DictSourceService, historyService *service.HistoryService) *SearchHandler {
 	return &SearchHandler{
-		manager:       manager,
-		cache:         cache,
-		db:            db,
-		dictSourceSvc: dictSourceSvc,
+		manager:        manager,
+		cache:          cache,
+		db:             db,
+		dictSourceSvc:  dictSourceSvc,
+		historyService: historyService,
 	}
 }
 
 // Search 跨字典搜索
 // GET /api/v1/search?word=xxx
 func (h *SearchHandler) Search(c *gin.Context) {
+	start := time.Now()
+
 	word := c.Query("word")
 	if word == "" {
 		response.BadRequest(c, "word parameter is required")
@@ -93,6 +97,17 @@ func (h *SearchHandler) Search(c *gin.Context) {
 
 	// 缓存结果
 	h.cache.Set(cacheKey, data, SearchCacheTTL)
+
+	// 记录搜索历史
+	if h.historyService != nil {
+		go h.historyService.Record(
+			word,
+			c.GetHeader("X-Session-ID"),
+			c.ClientIP(),
+			len(results) > 0,
+			time.Since(start).Milliseconds(),
+		)
+	}
 
 	response.Success(c, data)
 }
