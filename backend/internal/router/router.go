@@ -8,6 +8,7 @@ import (
 	"dict-hub/internal/handler"
 	"dict-hub/internal/middleware"
 	"dict-hub/internal/service"
+	"dict-hub/internal/service/audio"
 	"dict-hub/internal/service/mdx"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ type Services struct {
 	DownloadSvc   *service.DownloadService
 	HistorySvc    *service.HistoryService
 	WordFreqSvc   *service.WordFreqService
+	AudioSvc      *audio.AudioService
 }
 
 func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Services) *gin.Engine {
@@ -36,13 +38,25 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 	healthHandler := handler.NewHealthHandler()
 	r.GET("/health", healthHandler.Check)
 
+	// 静态资源目录（支持独立的音频、图片等文件）
+	r.Static("/static", cfg.MDX.DictDir)
+	
+	// 字典静态资源目录（CSS/JS/图片等）
+	r.Static("/dict-assets", cfg.MDX.SourceDir)
+
 	// 创建缓存实例（每分钟清理过期项）
 	cacheInstance := cache.New(time.Minute)
 
 	api := r.Group("/api/v1")
 	{
+		// 音频路由
+		if svcs.AudioSvc != nil {
+			audioHandler := handler.NewAudioHandler(svcs.AudioSvc)
+			api.GET("/audio/:word", audioHandler.GetAudio)
+		}
+
 		// 搜索路由（新增）
-		searchHandler := handler.NewSearchHandler(mdxManager, cacheInstance, db)
+		searchHandler := handler.NewSearchHandlerWithDictSource(mdxManager, cacheInstance, db, svcs.DictSourceSvc)
 		api.GET("/search", searchHandler.Search)
 		api.GET("/search/suggest", searchHandler.Suggest)
 
@@ -68,7 +82,7 @@ func Setup(cfg *config.Config, db *gorm.DB, mdxManager mdx.DictManager, svcs *Se
 		}
 
 		// 字典管理路由（新增）
-		dictHandler := handler.NewDictionaryHandler(svcs.DictSourceSvc, svcs.DownloadSvc)
+		dictHandler := handler.NewDictionaryHandler(svcs.DictSourceSvc, svcs.DownloadSvc, cacheInstance)
 		dictionaries := api.Group("/dictionaries")
 		{
 			dictionaries.GET("", dictHandler.List)

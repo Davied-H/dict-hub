@@ -13,8 +13,10 @@ type Config struct {
 }
 
 type MDXConfig struct {
-	DictDir  string `mapstructure:"dict_dir"`
-	AutoLoad bool   `mapstructure:"auto_load"`
+	DictDir   string `mapstructure:"dict_dir"`    // 保留兼容性
+	SourceDir string `mapstructure:"source_dir"`  // 字典源文件目录
+	SoundDir  string `mapstructure:"sound_dir"`   // 音频文件目录
+	AutoLoad  bool   `mapstructure:"auto_load"`
 }
 
 type ServerConfig struct {
@@ -51,6 +53,8 @@ func Load() (*Config, error) {
 	viper.SetDefault("log.level", "debug")
 	viper.SetDefault("log.format", "json")
 	viper.SetDefault("mdx.dict_dir", "./dicts")
+	viper.SetDefault("mdx.source_dir", "./dicts/source")
+	viper.SetDefault("mdx.sound_dir", "./dicts/sound")
 	viper.SetDefault("mdx.auto_load", false)
 
 	if err := viper.ReadInConfig(); err != nil {

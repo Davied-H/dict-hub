@@ -30,8 +30,8 @@ export default function Home() {
 
   return (
     <div
-      className={`flex flex-col items-center px-4 transition-all duration-500 ease-out ${
-        hasResults ? 'pt-6' : 'pt-[15vh]'
+      className={`flex flex-col items-center px-2 sm:px-4 transition-all duration-500 ease-out ${
+        hasResults ? 'pt-4 sm:pt-6' : 'pt-[8vh] sm:pt-[15vh]'
       }`}
     >
       {/* Logo/品牌 */}
@@ -54,7 +54,7 @@ export default function Home() {
         <div>
           <h1
             className={`font-bold bg-gradient-to-r from-primary-600 to-secondary-600 dark:from-primary-400 dark:to-secondary-400 bg-clip-text text-transparent transition-all duration-500 ${
-              hasResults ? 'text-2xl' : 'text-4xl'
+              hasResults ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-4xl'
             }`}
           >
             Dict Hub
@@ -106,7 +106,7 @@ export default function Home() {
 
       {/* 功能提示 - 仅在首页无搜索时显示 */}
       {!submittedKeyword && recentSearches.length === 0 && (
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl animate-fade-in-delay">
+        <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full max-w-3xl animate-fade-in-delay">
           <FeatureCard
             icon="📚"
             title="多字典支持"
@@ -127,7 +127,7 @@ export default function Home() {
 
       {/* 搜索结果区域 */}
       {submittedKeyword && (
-        <div className="w-full max-w-4xl mt-6 pb-16 animate-fade-in">
+        <div className="w-full max-w-4xl mt-4 sm:mt-6 pb-8 sm:pb-16 animate-fade-in">
           <SearchResults
             results={data?.results ?? []}
             keyword={submittedKeyword}
@@ -150,8 +150,8 @@ function FeatureCard({
   description: string
 }) {
   return (
-    <div className="flex flex-col items-center p-6 rounded-2xl bg-default-50 dark:bg-default-100/5 border border-default-200 dark:border-default-100 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
-      <span className="text-3xl mb-3">{icon}</span>
+    <div className="flex flex-col items-center p-4 sm:p-6 rounded-2xl bg-default-50 dark:bg-default-100/5 border border-default-200 dark:border-default-100 hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+      <span className="text-2xl sm:text-3xl mb-2 sm:mb-3">{icon}</span>
       <h3 className="font-semibold text-default-700 dark:text-default-300">
         {title}
       </h3>

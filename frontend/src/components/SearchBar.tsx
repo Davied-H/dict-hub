@@ -58,7 +58,7 @@ export function SearchBar() {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-2xl">
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
@@ -76,7 +76,7 @@ export function SearchBar() {
           color="primary"
           size="lg"
           onPress={() => submitSearch()}
-          className="px-8"
+          className="px-8 w-full sm:w-auto"
         >
           搜索
         </Button>

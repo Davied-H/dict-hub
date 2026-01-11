@@ -8,6 +8,7 @@ import (
 	"dict-hub/internal/database"
 	"dict-hub/internal/router"
 	"dict-hub/internal/service"
+	"dict-hub/internal/service/audio"
 	"dict-hub/internal/service/mdx"
 )
 
@@ -34,12 +35,14 @@ func main() {
 	// 初始化服务
 	historySvc := service.NewHistoryService(db)
 	wordFreqSvc := service.NewWordFreqService(db)
-	dictSourceSvc := service.NewDictSourceService(db, mdxManager, cfg.MDX.DictDir)
+	dictSourceSvc := service.NewDictSourceService(db, mdxManager, cfg.MDX.DictDir, cfg.MDX.SourceDir)
 	downloadSvc := service.NewDownloadService(db, cfg.MDX.DictDir, dictSourceSvc)
+	audioSvc := audio.NewAudioService(mdxManager, cfg.MDX.SoundDir)
+	defer audioSvc.Close()
 
 	// 自动扫描并添加字典目录中的新字典到数据库
 	if cfg.MDX.AutoLoad {
-		log.Printf("Auto-loading dictionaries from %s...", cfg.MDX.DictDir)
+		log.Printf("Auto-loading dictionaries from %s...", cfg.MDX.SourceDir)
 		addedCount, err := dictSourceSvc.AutoLoadFromDir()
 		if err != nil {
 			log.Printf("Warning: Failed to auto-load dictionaries: %v", err)
@@ -63,6 +66,7 @@ func main() {
 		DownloadSvc:   downloadSvc,
 		HistorySvc:    historySvc,
 		WordFreqSvc:   wordFreqSvc,
+		AudioSvc:      audioSvc,
 	}
 
 	r := router.Setup(cfg, db, mdxManager, svcs)

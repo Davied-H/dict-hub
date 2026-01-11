@@ -29,19 +29,30 @@ type ReorderItem struct {
 type DictSourceService struct {
 	db         *gorm.DB
 	mdxManager mdx.DictManager
-	dictDir    string
+	dictDir    string // 保留兼容性
+	sourceDir  string // 字典源文件目录
 	runtimeIDs map[uint]uint // DB ID -> Runtime ID 映射
 	mu         sync.RWMutex
 }
 
 // NewDictSourceService 创建字典来源服务
-func NewDictSourceService(db *gorm.DB, mdxManager mdx.DictManager, dictDir string) *DictSourceService {
+func NewDictSourceService(db *gorm.DB, mdxManager mdx.DictManager, dictDir, sourceDir string) *DictSourceService {
+	// 如果 sourceDir 为空，使用 dictDir 作为默认值
+	if sourceDir == "" {
+		sourceDir = dictDir
+	}
 	return &DictSourceService{
 		db:         db,
 		mdxManager: mdxManager,
 		dictDir:    dictDir,
+		sourceDir:  sourceDir,
 		runtimeIDs: make(map[uint]uint),
 	}
+}
+
+// GetSourceDir 获取字典源文件目录
+func (s *DictSourceService) GetSourceDir() string {
+	return s.sourceDir
 }
 
 // DictSourceResponse 字典响应（包含加载状态）
@@ -257,39 +268,42 @@ func (s *DictSourceService) SyncOnStartup() error {
 	return nil
 }
 
-// AutoLoadFromDir 自动扫描目录中的字典文件并添加到数据库
+// AutoLoadFromDir 自动扫描目录中的字典文件并添加到数据库（支持递归扫描子目录）
 func (s *DictSourceService) AutoLoadFromDir() (int, error) {
-	entries, err := os.ReadDir(s.dictDir)
-	if err != nil {
-		return 0, err
-	}
-
 	var addedCount int
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
+	
+	err := filepath.WalkDir(s.sourceDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil // 忽略单个文件错误，继续扫描
 		}
-		ext := strings.ToLower(filepath.Ext(entry.Name()))
+		if d.IsDir() {
+			return nil
+		}
+		
+		ext := strings.ToLower(filepath.Ext(d.Name()))
 		if ext != ".mdx" {
-			continue
+			return nil
 		}
-
-		fullPath := filepath.Join(s.dictDir, entry.Name())
 
 		// 检查是否已存在于数据库
 		var existing model.DictSource
-		if err := s.db.Unscoped().Where("path = ?", fullPath).First(&existing).Error; err == nil {
+		if err := s.db.Unscoped().Where("path = ?", path).First(&existing).Error; err == nil {
 			// 已存在，跳过
-			continue
+			return nil
 		}
 
 		// 添加到数据库
-		_, err := s.Add(fullPath)
+		_, err = s.Add(path)
 		if err != nil {
 			// 记录错误但继续处理其他文件
-			continue
+			return nil
 		}
 		addedCount++
+		return nil
+	})
+
+	if err != nil {
+		return addedCount, err
 	}
 
 	return addedCount, nil

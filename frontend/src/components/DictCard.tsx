@@ -30,13 +30,13 @@ export function DictCard({ dictTitle, results }: DictCardProps) {
   return (
     <Card className="dict-card overflow-hidden shadow-sm border border-default-200 dark:border-default-100">
       {/* 字典标题栏 */}
-      <CardHeader className="dict-card-header bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 py-3 px-5">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <BookIcon className="w-5 h-5 text-primary" />
+      <CardHeader className="dict-card-header bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 py-2.5 sm:py-3 px-3 sm:px-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+            <BookIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           </div>
           <div>
-            <h2 className="font-semibold text-default-800 dark:text-default-200">
+            <h2 className="font-semibold text-sm sm:text-base text-default-800 dark:text-default-200">
               {dictTitle}
             </h2>
           </div>
@@ -50,25 +50,25 @@ export function DictCard({ dictTitle, results }: DictCardProps) {
         {results.map((result, idx) => (
           <article
             key={idx}
-            className={`dict-entry p-5 ${
+            className={`dict-entry p-3 sm:p-5 ${
               idx !== results.length - 1
                 ? 'border-b border-default-100 dark:border-default-50'
                 : ''
             }`}
           >
             {/* 单词标题行 */}
-            <header className="flex items-start justify-between gap-4 mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400 tracking-tight">
+            <header className="flex items-start justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <h3 className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-primary-400 tracking-tight">
                   {result.word}
                 </h3>
-                <AudioPlayer definition={result.definition} />
+                <AudioPlayer definition={result.definition} word={result.word} />
               </div>
             </header>
 
             {/* 释义内容 */}
             <div className="dict-definition">
-              <DictContent html={result.definition} />
+              <DictContent html={result.definition} dictId={result.dict_id} />
             </div>
           </article>
         ))}

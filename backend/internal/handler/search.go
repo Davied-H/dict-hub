@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"dict-hub/internal/cache"
 	"dict-hub/internal/model"
+	"dict-hub/internal/service"
 	"dict-hub/internal/service/mdx"
 	"dict-hub/pkg/response"
 
@@ -23,14 +26,25 @@ const (
 
 // SearchHandler 搜索处理器
 type SearchHandler struct {
-	manager mdx.DictManager
-	cache   *cache.Cache
-	db      *gorm.DB
+	manager       mdx.DictManager
+	cache         *cache.Cache
+	db            *gorm.DB
+	dictSourceSvc *service.DictSourceService
 }
 
-// NewSearchHandler 创建搜索处理器
+// NewSearchHandler 创建搜索处理器（向后兼容）
 func NewSearchHandler(manager mdx.DictManager, cache *cache.Cache, db *gorm.DB) *SearchHandler {
 	return &SearchHandler{manager: manager, cache: cache, db: db}
+}
+
+// NewSearchHandlerWithDictSource 创建带字典来源服务的搜索处理器
+func NewSearchHandlerWithDictSource(manager mdx.DictManager, cache *cache.Cache, db *gorm.DB, dictSourceSvc *service.DictSourceService) *SearchHandler {
+	return &SearchHandler{
+		manager:       manager,
+		cache:         cache,
+		db:            db,
+		dictSourceSvc: dictSourceSvc,
+	}
 }
 
 // Search 跨字典搜索
@@ -53,7 +67,17 @@ func (h *SearchHandler) Search(c *gin.Context) {
 
 	// URL 重写
 	for i := range results {
-		results[i].Definition = rewriteResourceURLs(results[i].Definition, results[i].DictID)
+		// 获取字典路径以确定静态资源目录
+		dictPath := ""
+		if h.dictSourceSvc != nil {
+			for _, info := range h.manager.ListLoaded() {
+				if info.ID == results[i].DictID {
+					dictPath = info.Path
+					break
+				}
+			}
+		}
+		results[i].Definition = rewriteResourceURLsWithPath(results[i].Definition, results[i].DictID, dictPath, h.dictSourceSvc)
 	}
 
 	// 词频排序
@@ -148,9 +172,25 @@ func (h *SearchHandler) updateFrequency(word string) {
 	`, word)
 }
 
-// rewriteResourceURLs 重写相对路径资源 URL
+// rewriteResourceURLs 重写相对路径资源 URL（向后兼容）
 // 将 src="style.css" 或 href="image.png" 重写为 /api/v1/resources/{dictID}/path
 func rewriteResourceURLs(definition string, dictID uint) string {
+	return rewriteResourceURLsWithPath(definition, dictID, "", nil)
+}
+
+// rewriteResourceURLsWithPath 重写相对路径资源 URL，支持字典静态资源
+// CSS/JS 文件重写为 /dict-assets/{dictFolder}/xxx
+// MDD 资源重写为 /api/v1/resources/{dictID}/xxx
+func rewriteResourceURLsWithPath(definition string, dictID uint, dictPath string, dictSourceSvc *service.DictSourceService) string {
+	// 计算字典文件夹的相对路径
+	dictFolder := ""
+	if dictPath != "" && dictSourceSvc != nil {
+		sourceDir := dictSourceSvc.GetSourceDir()
+		if rel, err := filepath.Rel(sourceDir, filepath.Dir(dictPath)); err == nil {
+			dictFolder = rel
+		}
+	}
+
 	// 匹配 src="..." 和 href="..." 中的相对路径
 	// 排除以 / 或 http:// 或 https:// 开头的路径
 	re := regexp.MustCompile(`(src|href)=["']([^"':/][^"']*)["']`)
@@ -161,6 +201,14 @@ func rewriteResourceURLs(definition string, dictID uint) string {
 			return match
 		}
 		attr, path := parts[1], parts[2]
+		ext := strings.ToLower(filepath.Ext(path))
+
+		// CSS/JS 文件从字典文件夹加载（如果有字典路径）
+		if dictFolder != "" && (ext == ".css" || ext == ".js") {
+			return attr + `="/dict-assets/` + dictFolder + `/` + path + `"`
+		}
+
+		// 其他资源从 MDD 加载
 		return attr + `="/api/v1/resources/` + strconv.FormatUint(uint64(dictID), 10) + `/` + path + `"`
 	})
 }

@@ -159,24 +159,58 @@
 }
 
 /* ========================================
-   表格样式
+   表格样式 - 支持无 CSS 词典的默认美化
    ======================================== */
 .dict-content table {
   @apply w-full border-collapse my-4 text-sm;
 }
 
-.dict-content th {
-  @apply bg-default-100 dark:bg-default-100/10 
-         font-semibold text-left p-3
-         border-b-2 border-default-200 dark:border-default-100;
+/* 隐藏表头（如 "Words" 等无意义的列标题） */
+.dict-content table thead,
+.dict-content table th {
+  @apply hidden;
 }
 
-.dict-content td {
-  @apply p-3 border-b border-default-100 dark:border-default-50;
+/* 表格行样式 */
+.dict-content table tr {
+  @apply border-b border-default-100 dark:border-default-50;
+}
+
+.dict-content table tr:last-child {
+  @apply border-b-0;
 }
 
 .dict-content tr:hover td {
   @apply bg-default-50 dark:bg-default-100/5;
+}
+
+/* 表格单元格基础样式 */
+.dict-content td {
+  @apply p-2 sm:p-3 align-top;
+}
+
+/* 第一列：分类标签样式（如"注"、"科"等） */
+.dict-content td:first-child {
+  @apply font-bold text-primary-600 dark:text-primary-400
+         whitespace-nowrap pr-4 w-auto
+         text-center align-top;
+  min-width: 2.5rem;
+}
+
+/* 为单个汉字分类标签添加特殊样式 */
+.dict-content td:first-child:not(:empty) {
+  @apply text-lg;
+}
+
+/* 第二列如果是 "Words" 这样的标签列，也隐藏 */
+.dict-content table td:nth-child(2):empty,
+.dict-content table td:nth-child(2):only-child {
+  @apply hidden;
+}
+
+/* 最后一列：主要内容区域 */
+.dict-content td:last-child {
+  @apply w-full;
 }
 
 /* ========================================
@@ -187,6 +221,26 @@
          hover:text-primary-700 dark:hover:text-primary-300
          underline decoration-primary-300 dark:decoration-primary-700
          underline-offset-2 transition-colors;
+}
+
+/* 单词跳转链接样式（entry:// 协议） */
+.dict-content a[href^="entry://"] {
+  @apply cursor-pointer inline-flex items-center gap-0.5
+         text-primary-600 dark:text-primary-400
+         hover:text-primary-500 dark:hover:text-primary-300
+         decoration-dotted decoration-primary-400 dark:decoration-primary-600
+         hover:decoration-solid
+         transition-all duration-150;
+}
+
+.dict-content a[href^="entry://"]:hover {
+  @apply bg-primary-50 dark:bg-primary-900/30 rounded px-0.5 -mx-0.5;
+}
+
+/* 为跳转链接添加小图标提示 */
+.dict-content a[href^="entry://"]::after {
+  content: '↗';
+  @apply text-xs opacity-50 ml-0.5;
 }
 
 /* ========================================
@@ -233,6 +287,48 @@
 
 .dict-content hr {
   @apply my-4 border-default-200 dark:border-default-100;
+}
+
+/* ========================================
+   传统汉语词典样式 - 林语堂等无专属CSS的词典
+   ======================================== */
+
+/* 隐藏内容中的 "Words" 等无意义标签文本 */
+.dict-content table td {
+  /* 如果单元格只包含 "Words" 文本，通过视觉隐藏 */
+}
+
+/* 分类标签美化（单个汉字如"注"、"科"、"動"等） */
+.dict-content table tr td:first-child {
+  @apply relative;
+}
+
+/* 为分类标签添加背景装饰 */
+.dict-content table tr:not(:first-child) td:first-child:not(:empty) {
+  @apply bg-primary-50 dark:bg-primary-900/20 rounded-lg;
+  padding: 0.25rem 0.5rem;
+}
+
+/* 释义内容中的编号样式 */
+.dict-content table td:last-child {
+  @apply leading-relaxed;
+}
+
+/* 词条中的拼音标注 */
+.dict-content table td i,
+.dict-content table td em {
+  @apply text-secondary-600 dark:text-secondary-400 not-italic;
+  font-family: 'Times New Roman', serif;
+}
+
+/* 词条中的方括号内容（通常是拼音） */
+.dict-content table td {
+  /* 方括号内的拼音保持斜体 */
+}
+
+/* 词条链接样式增强 */
+.dict-content table a {
+  @apply font-medium;
 }
 
 /* ========================================
@@ -319,17 +415,70 @@
    ======================================== */
 @media (max-width: 640px) {
   .dict-content {
-    @apply text-sm;
+    @apply text-sm leading-normal;
   }
   
   .dict-content .YX,
-  .dict-content .DC {
-    @apply text-xl;
+  .dict-content .DC,
+  .dict-content .headword,
+  .dict-content .hw,
+  .dict-content .entry-word {
+    @apply text-lg;
   }
   
   .dict-content .example,
-  .dict-content .ex {
-    @apply pl-3 py-1.5;
+  .dict-content .ex,
+  .dict-content .sent,
+  .dict-content .sentence,
+  .dict-content [class*="example"],
+  .dict-content [class*="examp"] {
+    @apply pl-3 py-1.5 my-1.5;
+  }
+
+  /* 释义文本移动端间距调整 */
+  .dict-content .JX,
+  .dict-content .def,
+  .dict-content .definition,
+  .dict-content .meaning,
+  .dict-content .sense {
+    @apply my-2 pl-3;
+  }
+
+  /* 注释移动端调整 */
+  .dict-content .note,
+  .dict-content .usage-note,
+  .dict-content .grammar {
+    @apply my-2 p-2;
+  }
+
+  /* 表格改为水平滚动模式 */
+  .dict-content table {
+    @apply block overflow-x-auto my-3;
+  }
+
+  /* 列表移动端调整 */
+  .dict-content ul,
+  .dict-content ol {
+    @apply ml-3;
+  }
+
+  /* 音标移动端调整 */
+  .dict-content .YB,
+  .dict-content .CB,
+  .dict-content .phonetic,
+  .dict-content .pron,
+  .dict-content .pronunciation,
+  .dict-content [class*="phon"] {
+    @apply text-xs;
+  }
+
+  /* 词性标注移动端调整 */
+  .dict-content .DX,
+  .dict-content .pos,
+  .dict-content .part-of-speech,
+  .dict-content .gram,
+  .dict-content [class*="pos"] {
+    @apply text-xs px-1.5 py-0.5;
   }
 }
 

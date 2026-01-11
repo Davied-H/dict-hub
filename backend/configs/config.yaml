@@ -27,4 +27,6 @@ cors:
 
 mdx:
   dict_dir: ./dicts
+  source_dir: ./dicts/source
+  sound_dir: ./dicts/sound
   auto_load: true

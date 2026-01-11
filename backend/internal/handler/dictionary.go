@@ -3,6 +3,7 @@ package handler
 import (
 	"strconv"
 
+	"dict-hub/internal/cache"
 	"dict-hub/internal/service"
 	"dict-hub/pkg/response"
 
@@ -13,13 +14,15 @@ import (
 type DictionaryHandler struct {
 	dictSourceSvc *service.DictSourceService
 	downloadSvc   *service.DownloadService
+	cache         *cache.Cache
 }
 
 // NewDictionaryHandler 创建字典管理处理器
-func NewDictionaryHandler(dictSourceSvc *service.DictSourceService, downloadSvc *service.DownloadService) *DictionaryHandler {
+func NewDictionaryHandler(dictSourceSvc *service.DictSourceService, downloadSvc *service.DownloadService, cache *cache.Cache) *DictionaryHandler {
 	return &DictionaryHandler{
 		dictSourceSvc: dictSourceSvc,
 		downloadSvc:   downloadSvc,
+		cache:         cache,
 	}
 }
 
@@ -62,6 +65,9 @@ func (h *DictionaryHandler) Add(c *gin.Context) {
 		return
 	}
 
+	// 清除搜索缓存，新增字典可能影响搜索结果
+	h.cache.Clear()
+
 	response.Created(c, source)
 }
 
@@ -83,6 +89,9 @@ func (h *DictionaryHandler) Toggle(c *gin.Context) {
 		response.InternalError(c, "failed to toggle dictionary: "+err.Error())
 		return
 	}
+
+	// 清除搜索缓存，字典启用/禁用状态变更会影响搜索结果
+	h.cache.Clear()
 
 	response.Success(c, source)
 }
@@ -173,6 +182,9 @@ func (h *DictionaryHandler) Delete(c *gin.Context) {
 		response.InternalError(c, "failed to delete dictionary: "+err.Error())
 		return
 	}
+
+	// 清除搜索缓存，删除字典会影响搜索结果
+	h.cache.Clear()
 
 	response.Success(c, gin.H{"message": "dictionary deleted"})
 }
