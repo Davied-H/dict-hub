@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
+	"dict-hub/internal/service"
 	"dict-hub/internal/service/mdx"
 	"dict-hub/pkg/response"
 
@@ -15,11 +17,20 @@ import (
 )
 
 type MdxHandler struct {
-	manager mdx.DictManager
+	manager        mdx.DictManager
+	historyService *service.HistoryService
 }
 
 func NewMdxHandler(manager mdx.DictManager) *MdxHandler {
 	return &MdxHandler{manager: manager}
+}
+
+// NewMdxHandlerWithHistory 创建带历史服务的 MdxHandler
+func NewMdxHandlerWithHistory(manager mdx.DictManager, historyService *service.HistoryService) *MdxHandler {
+	return &MdxHandler{
+		manager:        manager,
+		historyService: historyService,
+	}
 }
 
 // List 列出已加载的字典
@@ -122,6 +133,8 @@ func (h *MdxHandler) Lookup(c *gin.Context) {
 // Search 跨字典搜索
 // GET /api/v1/dicts/search?word=xxx&ids=1,2,3
 func (h *MdxHandler) Search(c *gin.Context) {
+	start := time.Now()
+
 	word := c.Query("word")
 	if word == "" {
 		response.BadRequest(c, "word parameter is required")
@@ -141,6 +154,18 @@ func (h *MdxHandler) Search(c *gin.Context) {
 	}
 
 	results := h.manager.Search(word, dictIDs...)
+
+	// 记录搜索历史
+	if h.historyService != nil {
+		go h.historyService.Record(
+			word,
+			c.GetHeader("X-Session-ID"),
+			c.ClientIP(),
+			len(results) > 0,
+			time.Since(start).Milliseconds(),
+		)
+	}
+
 	response.Success(c, gin.H{
 		"word":    word,
 		"count":   len(results),
