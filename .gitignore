@@ -11,6 +11,15 @@ node_modules/
 # 构建产物
 dist/
 build/
+backend/dict-hub
+backend/dict-hub-server
+
+# 词典资源目录
+backend/dicts/sound/
+backend/dicts/source/
+
+# Claude 配置
+.claude/
 
 # 环境配置
 .env
