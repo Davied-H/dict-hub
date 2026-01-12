@@ -67,7 +67,7 @@ export function AudioPlayer({ word }: AudioPlayerProps) {
     fetch(`/api/v1/audio/${encodeURIComponent(word)}/availability`)
       .then(res => res.json())
       .then(data => {
-        if (data.code === 200 && data.data) {
+        if (data.code === 0 && data.data) {
           setAvailability(data.data)
         } else {
           setAvailability({ gb: false, us: false })

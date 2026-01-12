@@ -72,7 +72,7 @@ export default function Hero() {
                 </a>
 
                 <a
-                  href="/docs"
+                  href="/dict-hub/docs"
                   className="flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl font-semibold text-lg hover:bg-slate-200 transition-colors"
                 >
                   查看文档
