@@ -1,8 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { useShouldReduceMotion } from '../hooks/useIsMobile';
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useShouldReduceMotion();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end start'],
@@ -16,6 +19,136 @@ export default function Hero() {
   const cardRotateX = useTransform(scrollYProgress, [0, 0.5], [0, 10]);
   const cardScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
 
+  // 移动端简化版本
+  if (reduceMotion) {
+    return (
+      <section
+        ref={containerRef}
+        className="relative min-h-[100vh] flex items-center overflow-hidden bg-gradient-to-b from-slate-50 to-white"
+      >
+        {/* 静态背景 */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 -right-32 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 pt-32 pb-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left content */}
+            <div>
+              <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-6">
+                开源 MDX 词典查询系统
+              </span>
+
+              <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight mb-8">
+                <span className="text-gradient">现代化</span>
+                <br />
+                <span className="text-slate-900">词典查询平台</span>
+              </h1>
+
+              <p className="text-xl text-slate-600 leading-relaxed mb-10 max-w-lg">
+                Dict-Hub 是一个高性能的 MDX 词典查询系统，支持多词典管理、快速检索、历史记录追踪与词频统计。
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="#start"
+                  className="group flex items-center gap-3 px-8 py-4 bg-gradient-primary text-white rounded-2xl font-semibold text-lg shadow-xl shadow-primary/30"
+                >
+                  快速开始
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </a>
+
+                <a
+                  href="/docs"
+                  className="flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl font-semibold text-lg hover:bg-slate-200 transition-colors"
+                >
+                  查看文档
+                </a>
+              </div>
+            </div>
+
+            {/* Right card - search demo */}
+            <div className="relative lg:order-first">
+              <div className="relative bg-white rounded-3xl shadow-2xl border border-slate-200/50 p-8 overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-2xl" />
+                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl" />
+
+                {/* Search bar */}
+                <div className="relative flex items-center gap-4 px-6 py-4 bg-slate-50 rounded-2xl mb-6">
+                  <svg
+                    className="w-5 h-5 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" strokeWidth={2} />
+                    <path
+                      strokeLinecap="round"
+                      strokeWidth={2}
+                      d="M21 21l-4.35-4.35"
+                    />
+                  </svg>
+                  <span className="text-slate-900 font-medium">
+                    eloquent
+                    <span className="inline-block w-0.5 h-5 bg-primary ml-1 animate-pulse" />
+                  </span>
+                </div>
+
+                {/* Result items */}
+                {[
+                  {
+                    word: 'eloquent',
+                    phonetic: '/ˈeləkwənt/',
+                    definition: 'adj. 雄辩的，有口才的；有说服力的',
+                  },
+                  {
+                    word: 'eloquence',
+                    phonetic: '/ˈeləkwəns/',
+                    definition: 'n. 口才，雄辩；雄辩术',
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.word}
+                    className="relative p-5 rounded-2xl bg-slate-50/50 hover:bg-slate-100 transition-colors cursor-pointer mb-3 last:mb-0"
+                  >
+                    <div className="text-xl font-bold text-primary mb-1">
+                      {item.word}
+                    </div>
+                    <div className="text-sm text-slate-500 mb-2">
+                      {item.phonetic}
+                    </div>
+                    <div className="text-slate-600">{item.definition}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="w-6 h-10 border-2 border-slate-300 rounded-full flex justify-center pt-2">
+            <div className="w-1.5 h-3 bg-slate-400 rounded-full animate-bounce" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // 桌面端完整动画版本
   return (
     <section
       ref={containerRef}
@@ -109,9 +242,7 @@ export default function Hero() {
                 </motion.a>
 
                 <motion.a
-                  href="https://github.com/Davied-H/dict-hub"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/docs"
                   className="flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl font-semibold text-lg hover:bg-slate-200 transition-colors"
                   whileHover={{ scale: 1.05, y: -4 }}
                   whileTap={{ scale: 0.95 }}
