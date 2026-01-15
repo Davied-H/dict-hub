@@ -50,5 +50,8 @@ func autoMigrate(db *gorm.DB) error {
 		&model.WordFrequency{},
 		&model.DictSource{},
 		&model.DownloadTask{},
+		&model.Vocabulary{},
+		&model.Note{},
+		&model.ReviewRecord{},
 	)
 }
