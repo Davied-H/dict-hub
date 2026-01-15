@@ -3,6 +3,7 @@ version: '3.8'
 services:
   dict-hub:
     build: .
+    image: dict-hub:latest
     container_name: dict-hub
     ports:
       - "8080:8080"
@@ -21,9 +22,10 @@ services:
       - MDX_AUTO_LOAD=true
       - TZ=Asia/Shanghai
     restart: unless-stopped
+    # Increased timeouts for slower systems like unraid
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
       interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s

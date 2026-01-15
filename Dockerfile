@@ -47,7 +47,10 @@ RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o server ./cmd/server
 FROM alpine:3.20
 
 # Install runtime dependencies
-RUN apk add --no-cache ca-certificates tzdata
+# - libc6-compat: Required for CGO/SQLite compatibility
+# - ca-certificates: For HTTPS requests
+# - tzdata: For timezone support
+RUN apk add --no-cache ca-certificates tzdata libc6-compat
 
 # Set timezone
 ENV TZ=Asia/Shanghai
@@ -60,14 +63,16 @@ COPY --from=backend-builder /app/server .
 # Copy default config
 COPY backend/configs/config.yaml ./configs/
 
-# Create data directories
-RUN mkdir -p /app/data /app/dicts/source /app/dicts/sound
+# Create data directories with proper permissions
+# Using 777 to ensure compatibility with various unraid user configurations
+RUN mkdir -p /app/data /app/dicts/source /app/dicts/sound && \
+    chmod -R 777 /app/data /app/dicts
 
 # Expose port
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Run the application
